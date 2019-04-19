@@ -16,13 +16,14 @@ var loader = new THREE.OBJLoader();
 
 var gui;
 
+// Info from OBJ
+var objMin, objMax, objSize;
 
-var texture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/minecraft/atlas.png' );
-texture.magFilter = THREE.NearestFilter;
-var material = new THREE.MeshBasicMaterial({map: texture});
-
-
+// var texture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/minecraft/atlas.png' );
+// texture.magFilter = THREE.NearestFilter;
+var material = new THREE.MeshLambertMaterial({color:0x0259df});
 var geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+
 loadScene();
 animate();
 
@@ -52,10 +53,18 @@ function loadScene() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0xc5ecf9);
 
+  var cube = new THREE.Mesh(geometry, material);
+  cube.position.set(0, 0, 0);
+  scene.add(cube);
 
   // Lights!
   var ambientLight = new THREE.AmbientLight( 0xcccccc );
   scene.add(ambientLight);
+
+  var directionalLight = new THREE.DirectionalLight(0xffffff);
+  directionalLight.position.set(20, 25, -15);
+
+  scene.add(directionalLight);
 
   // For mouse movement tracking
   raycaster = new THREE.Raycaster();
@@ -65,29 +74,41 @@ function loadScene() {
   window.addEventListener('resize', onWindowResize, false);
 }
 
-// load a resource
+// Load a resource- fromm three.js docs
 loader.load(
 	// resource URL
-	'./Bigmax_White_OBJ.obj',
+	'https://raw.githubusercontent.com/catyang97/lego-project/master/src/Bigmax_White_OBJ.obj',
 	// called when resource is loaded
-	function ( object ) {
+	function (object) {
+    object.traverse( function ( child ) {
+      // console.log(object.children[0].children[0].geometry.vertices
+        // );
+      if ( child instanceof THREE.Mesh ) {
+        console.log(child);
+        //child.material.map = texture;
 
-		scene.add( object );
+      }
+
+    } );
+    object.position.set(0,0,0);
+    scene.add(object);
+    var box = new THREE.Box3().setFromObject(object);
+    objMin = box.min,
+    objMax = box.max,
+    objSize = box.getSize();
+    console.log(loader.vertices);
 
 	},
 	// called when loading is in progresses
-	function ( xhr ) {
-
-		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
+	function (xhr) {
+		console.log((xhr.loaded / xhr.total * 100) + '% loaded');
 	},
 	// called when loading has errors
-	function ( error ) {
-
-		console.log( 'An error happened' );
-
+	function (error) {
+		console.log('An error happened');
 	}
 );
+
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();

@@ -356,7 +356,6 @@ THREE.OBJLoader = ( function () {
 		};
 
 		state.startObject( '', false );
-
 		return state;
 
 	}
@@ -774,6 +773,7 @@ THREE.OBJLoader = ( function () {
 					} else {
 
 						mesh = new THREE.Mesh( buffergeometry, createdMaterials[ 0 ] );
+						console.log(mesh);
 
 					}
 

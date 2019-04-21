@@ -86,43 +86,82 @@ loader.load(
     // Add all vertices of the obj to objVertices
     object.traverse(function(child) {
       if (child instanceof THREE.Mesh) {
-        scene.add(child);
-        // raycaster.set(new THREE.Vector3(0, 15, -8), new THREE.Vector3(0, 0, 1));
+        // scene.add(child);
 
-        // var intersects = raycaster.intersectObject(child);
-        // console.log(intersects);
-
+        // Start from bottom to top- y values
         var startY = Math.floor(objMin.y);
         var endY = Math.ceil(objMax.y);
+        var rem = ((objMax.x-objMin.x)/2.0)%1;
         for (var i = startY; i < endY; i++) {
-          console.log(i);
-          // var raycaster = new THREE.Raycaster();
+          var startX = Math.floor(objMin.x);
+          var endX = Math.ceil(objMax.x);
+          var startZ = Math.floor(objMin.z);
+          var endZ = Math.ceil(objMax.z);
+          for (var j = startX; j < endX; j++) {
+            var start, end;
+            var yes = false;
+            // Shoot ray from front
+            raycaster.set(new THREE.Vector3(j+rem, i+0.5, endZ+5), new THREE.Vector3(0, 0, -1));
+            var intersects = raycaster.intersectObject(child);
+            if (intersects.length === 0) {
+              // empty??
+              yes = false;
+            } else {
+              yes = true;
+              var points = intersects[0].point;
+              end = points;
+            }
 
-          raycaster.set(new THREE.Vector3(0, i+0.5, -8), new THREE.Vector3(0, 0, 1));
-
-          var intersects = raycaster.intersectObject(child);
-          if (intersects.length === 0) {
-            // empty??
-          } else {
-            console.log(intersects);
-            var cube = new THREE.Mesh(geometry, material);
-            var points = intersects[0].point;
-            cube.position.set(points.x, points.y, points.z);
-            scene.add(cube);
+            // Shoot ray from back
+            raycaster.set(new THREE.Vector3(j+rem, i+0.5, startZ-5), new THREE.Vector3(0, 0, 1));
+            var intersects = raycaster.intersectObject(child);
+            if (intersects.length === 0) {
+              // empty??
+              yes = false;
+            } else {
+              if (yes) {
+                yes = true;
+              }
+              var points = intersects[0].point;
+              start = points;
+            }
+            if (yes) {
+              // This adds the 1by1 blocks
+              // for (var k = Math.ceil(start.z); k < Math.ceil(end.z); k++) {
+              //   var cube = new THREE.Mesh(geometry, material);
+              //   cube.position.set(j+rem, i, k);
+              //   scene.add(cube);
+              // }
+              
+              // Save info
+              // x = j+rem, y = k, z = Math.ceil(start.z to Math.ceil(end.z)
+            }
           }
 
-          raycaster.set(new THREE.Vector3(0, i+0.5, 8), new THREE.Vector3(0, 0, -1));
+          // raycaster.set(new THREE.Vector3(0, i+0.5, -8), new THREE.Vector3(0, 0, 1));
+          // var intersects = raycaster.intersectObject(child);
+          // if (intersects.length === 0) {
+          //   // empty??
+          // } else {
+          //   console.log(intersects);
+          //   var cube = new THREE.Mesh(geometry, material);
+          //   var points = intersects[0].point;
+          //   cube.position.set(points.x, points.y, points.z);
+          //   scene.add(cube);
+          // }
 
-          var intersects = raycaster.intersectObject(child);
-          if (intersects.length === 0) {
-            // empty??
-          } else {
-            console.log(intersects);
-            var cube = new THREE.Mesh(geometry, material);
-            var points = intersects[0].point;
-            cube.position.set(points.x, i, points.z); // i or y??
-            scene.add(cube);
-          }
+          // raycaster.set(new THREE.Vector3(0, i+0.5, 8), new THREE.Vector3(0, 0, -1));
+
+          // var intersects = raycaster.intersectObject(child);
+          // if (intersects.length === 0) {
+          //   // empty??
+          // } else {
+          //   console.log(intersects);
+          //   var cube = new THREE.Mesh(geometry, material);
+          //   var points = intersects[0].point;
+          //   cube.position.set(points.x, i, points.z); // i or y??
+          //   scene.add(cube);
+          // }
 
         }
 

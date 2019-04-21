@@ -12,7 +12,8 @@ var container, stats;
 var camera, controls, scene, renderer, raycaster;
 var mouse = new THREE.Vector2(),INTERSECTED;
 var loader = new THREE.OBJLoader();
-var map = new Map();
+var mapLayers = new Map();
+var mapOffsets = new Map();
 var gui;
 
 // Info from OBJ
@@ -24,10 +25,8 @@ raycaster = new THREE.Raycaster();
 var material = new THREE.MeshLambertMaterial({color:0x0259df});
 var geometry = new THREE.BoxBufferGeometry(1, 1, 1);
 
-
 loadScene();
 animate();
-
 
 function loadScene() {
   // Set up sections of window- renderer and stats
@@ -54,10 +53,6 @@ function loadScene() {
   scene.background = new THREE.Color(0xc5ecf9);
   scene.add(new THREE.AxesHelper(20));
 
-  // var cube = new THREE.Mesh(geometry, material);
-  // cube.position.set(0, 5, 0);
-  // scene.add(cube);
-
   // Lights!
   var ambientLight = new THREE.AmbientLight( 0xcccccc );
   scene.add(ambientLight);
@@ -76,7 +71,8 @@ function loadScene() {
 // Load a resource- from three.js docs
 loader.load(
 	// Resource URL
-	'https://raw.githubusercontent.com/catyang97/lego-project/master/src/baymax.obj',
+  // 'https://raw.githubusercontent.com/catyang97/lego-project/master/src/baymax.obj',
+  'https://raw.githubusercontent.com/catyang97/566-final-project/master/src/assets/wahoo.obj',
 	// Called when resource is loaded
 	function (object) {
     var box = new THREE.Box3().setFromObject(object);
@@ -92,7 +88,11 @@ loader.load(
         var startY = Math.floor(objMin.y);
         var endY = Math.ceil(objMax.y);
         var rem = ((objMax.x-objMin.x)/2.0)%1;
+        rem = 0;
         for (var i = startY; i < endY; i++) {
+          // Create 2D array
+
+
           var startX = Math.floor(objMin.x);
           var endX = Math.ceil(objMax.x);
           var startZ = Math.floor(objMin.z);
@@ -103,6 +103,13 @@ loader.load(
             // Shoot ray from front
             raycaster.set(new THREE.Vector3(j+rem, i+0.5, endZ+5), new THREE.Vector3(0, 0, -1));
             var intersects = raycaster.intersectObject(child);
+            if (intersects.length > 1 && j == 4) { 
+              for (var hello = 0; hello < intersects.length; hello++) {
+                                var cube = new THREE.Mesh(geometry, material);
+                cube.position.set(intersects[hello].point.x, intersects[hello].point.y, intersects[hello].point.z);
+                // scene.add(cube);
+              }
+              console.log(intersects);}
             if (intersects.length === 0) {
               // empty??
               yes = false;
@@ -115,6 +122,12 @@ loader.load(
             // Shoot ray from back
             raycaster.set(new THREE.Vector3(j+rem, i+0.5, startZ-5), new THREE.Vector3(0, 0, 1));
             var intersects = raycaster.intersectObject(child);
+            if (intersects.length > 1 && j == 4) {               for (var hello = 0; hello < intersects.length; hello++) {
+              var cube = new THREE.Mesh(geometry, material);
+cube.position.set(intersects[hello].point.x, intersects[hello].point.y, intersects[hello].point.z);
+// scene.add(cube);
+}console.log(intersects);}
+
             if (intersects.length === 0) {
               // empty??
               yes = false;
@@ -127,42 +140,16 @@ loader.load(
             }
             if (yes) {
               // This adds the 1by1 blocks
-              // for (var k = Math.ceil(start.z); k < Math.ceil(end.z); k++) {
-              //   var cube = new THREE.Mesh(geometry, material);
-              //   cube.position.set(j+rem, i, k);
-              //   scene.add(cube);
-              // }
+              for (var k = Math.ceil(start.z); k < Math.ceil(end.z); k++) {
+                var cube = new THREE.Mesh(geometry, material);
+                cube.position.set(j+rem, i, k);
+                scene.add(cube);
+              }
               
               // Save info
               // x = j+rem, y = k, z = Math.ceil(start.z to Math.ceil(end.z)
             }
           }
-
-          // raycaster.set(new THREE.Vector3(0, i+0.5, -8), new THREE.Vector3(0, 0, 1));
-          // var intersects = raycaster.intersectObject(child);
-          // if (intersects.length === 0) {
-          //   // empty??
-          // } else {
-          //   console.log(intersects);
-          //   var cube = new THREE.Mesh(geometry, material);
-          //   var points = intersects[0].point;
-          //   cube.position.set(points.x, points.y, points.z);
-          //   scene.add(cube);
-          // }
-
-          // raycaster.set(new THREE.Vector3(0, i+0.5, 8), new THREE.Vector3(0, 0, -1));
-
-          // var intersects = raycaster.intersectObject(child);
-          // if (intersects.length === 0) {
-          //   // empty??
-          // } else {
-          //   console.log(intersects);
-          //   var cube = new THREE.Mesh(geometry, material);
-          //   var points = intersects[0].point;
-          //   cube.position.set(points.x, i, points.z); // i or y??
-          //   scene.add(cube);
-          // }
-
         }
 
         // var objPos = child.geometry.attributes.position;
@@ -188,7 +175,6 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-  // controls.handleResize();
 }
 
 function animate() {
@@ -201,6 +187,7 @@ function render() {
   controls.update();
   renderer.render(scene, camera);
 }
+
 function onDocumentMouseDown(event) {
   
 }

@@ -105,8 +105,8 @@ animate();
 // Load a resource- from three.js docs
 loader.load(
 	// Resource URL
-  'https://raw.githubusercontent.com/catyang97/lego-project/master/src/baymax.obj',
-  // 'https://raw.githubusercontent.com/catyang97/lego-project/master/src/mario.obj',
+  // 'https://raw.githubusercontent.com/catyang97/lego-project/master/src/baymax.obj',
+  'https://raw.githubusercontent.com/catyang97/lego-project/master/src/mario.obj',
 	// Called when resource is loaded
 	function (object) {
     var box = new THREE.Box3().setFromObject(object);
@@ -193,7 +193,6 @@ loader.load(
                 } else {
                   zArray[k] = 0;
                 }
-
               }
 
             } else {
@@ -245,52 +244,99 @@ function setUpBricks() {
   for (var i = startY; i < endY; i++) {
     var xzArray = mapLayers.get(i);
 
-    if (i % 2 == 0) { // even - x then z
+    // if (i % 2 == 0) { // even - x then z
       for (var j = startX; j < endX; j++) {
         // Getting the 2D array
         var zArray = xzArray[j];
         var curr = 0;
         var curr2by3, curr2by4, curr2by6, curr2by8, curr2by2 = 0;
 
-        for (var k = startZ; k < endZ; k++) {
-          if (zArray[k] === 2) {
+        for (var k = startZ; k < endZ+1; k++) {
+          if (zArray[k] === 2 && k < endZ) {
             curr++;
           } else {
             // What is curr right now??
             if (num2by8 > 0) { // Are there enough bricks?
-              // console.log('we out here');
               curr2by8 = Math.floor(curr/4);
-              if (num2by8 - curr2by8 < 0) { // Not enough blocks
-                curr2by8 = num2by8;
-              }
-              num2by8 -= curr2by8; // Subtract from total available
-              // Renumber
-              for (var renum = (k-(curr2by8*4)); renum < k; renum++) {
-                zArray[renum] = 8;
-              }
-              // // Draw
-              for (var draw = 0; draw < curr2by8; draw++) {
-                var brick = new THREE.Mesh(geo2by8, material);
-                brick.position.set(j, i, k-2.5-(draw*4));
-                scene.add(brick);
+              if (curr2by8 > 0) {
+                if (num2by8 - curr2by8 < 0) { // Not enough blocks
+                  curr2by8 = num2by8;
+                }
+                num2by8 -= curr2by8; // Subtract from total available
+                // Renumber
+                var startK = k-(curr2by8*4)-curr;
+                var endK = startK + (curr2by8*4);
+                for (var renum = startK; renum < endK; renum++) {
+                  zArray[renum] = 8;
+                }
+                curr-=curr2by8*4;
+                // Draw
+                for (var draw = 0; draw < curr2by8; draw++) {
+                  var brick = new THREE.Mesh(geo2by8, material);
+                  brick.position.set(j, i, k-2.5-(draw*4)-curr);
+                  scene.add(brick);
+                }
               }
             }
 
+            if (num2by6 > 0) { // Are there enough bricks?
+              curr2by6 = Math.floor(curr/3);
+              if (curr2by6 > 0) {
+                if (num2by6 - curr2by6 < 0) { // Not enough blocks
+                  curr2by6 = num2by6;
+                }
+                num2by6 -= curr2by6; // Subtract from total available
+                // Renumber
+                var startK = k-(curr2by6*3)-curr;
+                var endK = startK + (curr2by6*3);
+                for (var renum = startK; renum < endK; renum++) {
+                  zArray[renum] = 6;
+                }
+                curr-=curr2by6*3; //?
+                // Draw
+                for (var draw = 0; draw < curr2by6; draw++) {
+                  var brick = new THREE.Mesh(geo2by6, material);
+                  brick.position.set(j, i, k-2-(draw*3)-curr);
+                  scene.add(brick);
+                }
 
+              }
+            }
 
-            var count = 0;
-            // while (num2by8 > 0 && curr2by8 > 0) {
-            //   // Renumber
-            //   for (var re = (k-8))
-            //   // Draw
+            if (num2by4 > 0) { // Are there enough bricks?
+              curr2by4 = Math.floor(curr/2);
+              if (curr2by4 > 0) {
+                if (num2by4 - curr2by4 < 0) { // Not enough blocks
+                  curr2by4 = num2by4;
+                }
+                num2by4 -= curr2by4; // Subtract from total available
+                // Renumber
+                var startK = k-(curr2by4*2)-curr;
+                var endK = startK + (curr2by4*2);
+                for (var renum = startK; renum < endK; renum++) {
+                  zArray[renum] = 4;
+                }
+                curr-=curr2by4*2;
+                // Draw
+                for (var draw = 0; draw < curr2by4; draw++) {
+                  var brick = new THREE.Mesh(geo2by4, material);
+                  brick.position.set(j, i, k-1.5-(draw*2)-curr);
+                  scene.add(brick);
+                }
+              }
+            }
 
-            //   // Subtract
-            // }
-            // curr-=count;
-
+            if (curr > 0) { // Fill remaining spots with single bricks
+              for (var draw = 0; draw < curr; draw++) {
+                var brick = new THREE.Mesh(geometry, material);
+                brick.position.set(j, i, k-1-draw);
+                scene.add(brick);
+                console.log('brea');
+              }            
+            }
 
             curr2by3, curr2by4, curr2by6, curr2by8, curr2by2, curr = 0;
-            // mapLayers.set(i, zArray); // Update the map with updated array
+            mapLayers.set(i, zArray); // Update the map with updated array
           }
         }
 
@@ -305,18 +351,18 @@ function setUpBricks() {
         
 
       }
-    } else { // odd - z then x
-      for (var k = startZ; k < endZ; k++) {
-        for (var j = startX; j < endX; j++) {
-          var val = xzArray[j][k];
-          if (val === 1) {
-            // var cube = new THREE.Mesh(geometry, material);
-            // cube.position.set(j, i, k);
-            // scene.add(cube);
-          }
-        }
-      }
-    }
+    // } else { // odd - z then x
+    //   for (var k = startZ; k < endZ; k++) {
+    //     for (var j = startX; j < endX; j++) {
+    //       var val = xzArray[j][k];
+    //       if (val === 1) {
+    //         // var cube = new THREE.Mesh(geometry, material);
+    //         // cube.position.set(j, i, k);
+    //         // scene.add(cube);
+    //       }
+    //     }
+    //   }
+    // }
 
 
   }

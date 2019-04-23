@@ -16,6 +16,7 @@ var mouse = new THREE.Vector2(),INTERSECTED;
 var loader = new THREE.OBJLoader();
 
 var mapLayers = new Map();
+var mapLayersOdd = new Map();
 var positionOffsets = new Array(3);
 var gui;
 scene = new THREE.Scene();
@@ -105,8 +106,8 @@ animate();
 // Load a resource- from three.js docs
 loader.load(
 	// Resource URL
-  // 'https://raw.githubusercontent.com/catyang97/lego-project/master/src/baymax.obj',
-  'https://raw.githubusercontent.com/catyang97/lego-project/master/src/mario.obj',
+  'https://raw.githubusercontent.com/catyang97/lego-project/master/src/baymax.obj',
+  // 'https://raw.githubusercontent.com/catyang97/lego-project/master/src/mario.obj',
 	// Called when resource is loaded
 	function (object) {
     var box = new THREE.Box3().setFromObject(object);
@@ -135,10 +136,21 @@ loader.load(
         for (var i = startY; i < endY; i++) {
           // Create 2D array
           var xArray = new Array(xSize);
+          var oddZArray = new Array(zSize);
+
+          // Set up array for odd y values
+          for (var k = startZ; k < endZ; k++) {          
+            var oddXArray = new Array(xSize);
+            // for (var j = startX; j < endX; j++) {
+            //   oddXArray = 0;
+            // }
+            oddZArray[k] = oddXArray;
+          }
 
           for (var j = startX; j < endX; j++) {
             var zSize = endZ - startZ;
             var zArray = new Array(zSize);
+
 
             var start, end;
             var yes = false;
@@ -183,32 +195,33 @@ loader.load(
               //   cube.position.set(j+rem, i, k);
               //   scene.add(cube);
               // }
-              
-              // Save info
-              // x = j+rem, y = k, z = Math.ceil(start.z to Math.ceil(end.z)
 
               for (var k = startZ; k < endZ; k++) {
                 if (k >= Math.ceil(start.z) && k < Math.ceil(end.z)) {
                   zArray[k] = 2; // Regular 2 by 2 bricks
+                  oddZArray[k][j] = 2;
                 } else {
                   zArray[k] = 0;
+                  oddZArray[k][j] = 0;
                 }
               }
 
             } else {
               for (var k = startZ; k < endZ; k++) {
                 zArray[k] = 0;
+                oddZArray[k][j] = 0;
               }
             }
             xArray[j] = zArray;
           }
 
           // Pass number 2 
-
-
+        
           mapLayers.set(i, xArray);
+          mapLayersOdd.set(i, oddZArray);
         }
 
+        // Get all vertices
         // var objPos = child.geometry.attributes.position;
         // for (var i = 0; i < objPos.count; i++) {
         //   var vector = new THREE.Vector3();
@@ -235,16 +248,15 @@ loader.load(
 // }
 
 function setUpBricks() {
-  console.log(mapLayers);
+  // consolce.log(mapLayers);
   // loadScene();
   // animate();
 
-  // var curr;
-
   for (var i = startY; i < endY; i++) {
     var xzArray = mapLayers.get(i);
+    var zxArray = mapLayersOdd.get(i);
 
-    // if (i % 2 == 0) { // even - x then z
+    if (i % 2 == 0) { // even - x then z
       for (var j = startX; j < endX; j++) {
         // Getting the 2D array
         var zArray = xzArray[j];
@@ -331,42 +343,112 @@ function setUpBricks() {
                 var brick = new THREE.Mesh(geometry, material);
                 brick.position.set(j, i, k-1-draw);
                 scene.add(brick);
-                console.log('brea');
               }            
             }
-
             curr2by3, curr2by4, curr2by6, curr2by8, curr2by2, curr = 0;
-            mapLayers.set(i, zArray); // Update the map with updated array
           }
         }
-
-        // Get numbers needed of each brick size
-        // var curr2by3, curr2by4, curr2by6, curr2by8, curr2by2 = 0;
-
-        // curr2by6 = Math.floor(curr/3);
-        // curr-=curr2by6;
-        // curr2by4 = Math.floor(curr/2);
-        // curr-=curr2by4;
-        // curr2by2 = curr;
-        
-
+        xzArray[j] = zArray; // Update 2D array for this level
       }
-    // } else { // odd - z then x
-    //   for (var k = startZ; k < endZ; k++) {
-    //     for (var j = startX; j < endX; j++) {
-    //       var val = xzArray[j][k];
-    //       if (val === 1) {
-    //         // var cube = new THREE.Mesh(geometry, material);
-    //         // cube.position.set(j, i, k);
-    //         // scene.add(cube);
-    //       }
-    //     }
-    //   }
-    // }
+    } else { // odd - z then x
+      for (var k = startZ; k < endZ; k++) {
+        // Getting the 2D array
+        var xArray = zxArray[k];
+        var curr = 0;
+        var curr2by3, curr2by4, curr2by6, curr2by8, curr2by2 = 0;
 
+        for (var j = startX; j < endX+1; j++) {
+          if (xArray[j] === 2 && j < endX) {
+            curr++;
+          } else {
+            // What is curr right now??
+            if (num2by8 > 0) { // Are there enough bricks?
+              curr2by8 = Math.floor(curr/4);
+              if (curr2by8 > 0) {
+                if (num2by8 - curr2by8 < 0) { // Not enough blocks
+                  curr2by8 = num2by8;
+                }
+                num2by8 -= curr2by8; // Subtract from total available
+                // Renumber
+                var startJ = j-(curr2by8*4)-curr;
+                var endJ = startJ + (curr2by8*4);
+                for (var renum = startJ; renum < endJ; renum++) {
+                  xArray[renum] = 8;
+                }
+                curr-=curr2by8*4;
+                // Draw
+                for (var draw = 0; draw < curr2by8; draw++) {
+                  var brick = new THREE.Mesh(geo8by2, material);
+                  brick.position.set(j-2.5-(draw*4)-curr, i, k);
+                  scene.add(brick);
+                }
+              }
+            }
 
+            if (num2by6 > 0) { // Are there enough bricks?
+              curr2by6 = Math.floor(curr/3);
+              if (curr2by6 > 0) {
+                if (num2by6 - curr2by6 < 0) { // Not enough blocks
+                  curr2by6 = num2by6;
+                }
+                num2by6 -= curr2by6; // Subtract from total available
+                // Renumber
+                var startJ = j-(curr2by6*3)-curr;
+                var endJ = startJ + (curr2by6*3);
+                for (var renum = startJ; renum < endJ; renum++) {
+                  xArray[renum] = 6;
+                }
+                curr-=curr2by6*3; //?
+                // Draw
+                for (var draw = 0; draw < curr2by6; draw++) {
+                  var brick = new THREE.Mesh(geo6by2, material);
+                  brick.position.set(j-2-(draw*3)-curr, i, k);
+                  scene.add(brick);
+                }
+
+              }
+            }
+
+            if (num2by4 > 0) { // Are there enough bricks?
+              curr2by4 = Math.floor(curr/2);
+              if (curr2by4 > 0) {
+                if (num2by4 - curr2by4 < 0) { // Not enough blocks
+                  curr2by4 = num2by4;
+                }
+                num2by4 -= curr2by4; // Subtract from total available
+                // Renumber
+                var startJ = j-(curr2by4*2)-curr;
+                var endJ = startJ + (curr2by4*2);
+                for (var renum = startJ; renum < endJ; renum++) {
+                  xArray[renum] = 4;
+                }
+                curr-=curr2by4*2;
+                // Draw
+                for (var draw = 0; draw < curr2by4; draw++) {
+                  var brick = new THREE.Mesh(geo4by2, material);
+                  brick.position.set(j-1.5-(draw*2)-curr, i, k);
+                  scene.add(brick);
+                }
+              }
+            }
+
+            if (curr > 0) { // Fill remaining spots with single bricks
+              for (var draw = 0; draw < curr; draw++) {
+                var brick = new THREE.Mesh(geometry, material);
+                brick.position.set(j-1-draw, i, k);
+                scene.add(brick);
+              }            
+            }
+            curr2by3, curr2by4, curr2by6, curr2by8, curr2by2, curr = 0;
+          }
+        }
+        zxArray[j] = xArray; // Update 2D array for this level
+      }
+
+    }
+    mapLayers.set(i, xzArray); // Update the map with updated arrays
+    mapLayers.set(i, zxArray);
   }
-
 }
 
 function onWindowResize() {

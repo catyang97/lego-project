@@ -1,17 +1,17 @@
 const THREE = require('three');
-import Noise from './Noise';
-import { runInNewContext } from 'vm';
-import { Int8Attribute } from 'three';
 var OrbitControls = require('./OrbitControls.js');
 var Stats = require('./stats.min.js');
 var dat = require('./dat.gui.min.js');
 var OBJLoader = require('./OBJLoader.js');
+
 // if ( WEBGL.isWebGLAvailable() === false ) {
 //   document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 //   document.getElementById( 'container' ).innerHTML = "";
 // }
+
+// Set Up
 var container, stats;
-var camera, controls, scene, renderer, raycaster;
+var camera, controls, scene, renderer, raycaster, raycasterSelect;
 var mouse = new THREE.Vector2(),INTERSECTED;
 var loader = new THREE.OBJLoader();
 
@@ -28,9 +28,8 @@ var startX, endX, startY, endY, startZ, endZ;
 var num2by2, num2by3, num2by4, num2by6, num2by8;
 
 raycaster = new THREE.Raycaster();
-// var texture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/minecraft/atlas.png' );
-// texture.magFilter = THREE.NearestFilter;
-var material = new THREE.MeshLambertMaterial({color:0x0259df});
+raycasterSelect = new THREE.Raycaster();
+
 // Different brick shapes
 var geometry = new THREE.BoxBufferGeometry(1, 1, 1);
 var geo2by3 = new THREE.BoxBufferGeometry(1, 1, 1.5);
@@ -84,6 +83,10 @@ controls.keyPanSpeed = 15.0;
 scene.background = new THREE.Color(0xc5ecf9);
 scene.add(new THREE.AxesHelper(20));
 
+// For brick selection
+var material = new THREE.MeshLambertMaterial({color:0x0259df});
+
+
 // Lights!
 var ambientLight = new THREE.AmbientLight( 0xcccccc );
 scene.add(ambientLight);
@@ -96,6 +99,7 @@ scene.add(directionalLight);
 // console.log(positionOffsets);
 
 document.addEventListener('mousedown', onDocumentMouseDown, false);
+document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 window.addEventListener('keydown', onKeyDown, false);
 window.addEventListener('keyup', onKeyUp, false);
 window.addEventListener('resize', onWindowResize, false);
@@ -151,7 +155,6 @@ loader.load(
             var zSize = endZ - startZ;
             var zArray = new Array(zSize);
 
-
             var start, end;
             var yes = false;
             // Shoot ray from front
@@ -189,13 +192,6 @@ loader.load(
               start = points;
             }
             if (yes) {
-              // This adds the 1by1 blocks
-              // for (var k = Math.ceil(start.z); k < Math.ceil(end.z); k++) {
-              //   var cube = new THREE.Mesh(geometry, material);
-              //   cube.position.set(j+rem, i, k);
-              //   scene.add(cube);
-              // }
-
               for (var k = startZ; k < endZ; k++) {
                 if (k >= Math.ceil(start.z) && k < Math.ceil(end.z)) {
                   zArray[k] = 2; // Regular 2 by 2 bricks
@@ -215,10 +211,14 @@ loader.load(
             xArray[j] = zArray;
           }
 
-          // Pass number 2 
-        
+          // TODO: Pass number 2 
+
+
+          // if (i % 2 == 0) {
           mapLayers.set(i, xArray);
+          // } else {
           mapLayersOdd.set(i, oddZArray);
+          // }
         }
 
         // Get all vertices
@@ -248,7 +248,8 @@ loader.load(
 // }
 
 function setUpBricks() {
-  // consolce.log(mapLayers);
+  console.log(mapLayers);
+  console.log(mapLayersOdd);
   // loadScene();
   // animate();
 
@@ -284,6 +285,7 @@ function setUpBricks() {
                 curr-=curr2by8*4;
                 // Draw
                 for (var draw = 0; draw < curr2by8; draw++) {
+                  var material = new THREE.MeshLambertMaterial({color:0x0259df});
                   var brick = new THREE.Mesh(geo2by8, material);
                   brick.position.set(j, i, k-2.5-(draw*4)-curr);
                   scene.add(brick);
@@ -307,6 +309,7 @@ function setUpBricks() {
                 curr-=curr2by6*3; //?
                 // Draw
                 for (var draw = 0; draw < curr2by6; draw++) {
+                  var material = new THREE.MeshLambertMaterial({color:0x0259df});
                   var brick = new THREE.Mesh(geo2by6, material);
                   brick.position.set(j, i, k-2-(draw*3)-curr);
                   scene.add(brick);
@@ -331,6 +334,7 @@ function setUpBricks() {
                 curr-=curr2by4*2;
                 // Draw
                 for (var draw = 0; draw < curr2by4; draw++) {
+                  var material = new THREE.MeshLambertMaterial({color:0x0259df});
                   var brick = new THREE.Mesh(geo2by4, material);
                   brick.position.set(j, i, k-1.5-(draw*2)-curr);
                   scene.add(brick);
@@ -340,6 +344,7 @@ function setUpBricks() {
 
             if (curr > 0) { // Fill remaining spots with single bricks
               for (var draw = 0; draw < curr; draw++) {
+                var material = new THREE.MeshLambertMaterial({color:0x0259df});
                 var brick = new THREE.Mesh(geometry, material);
                 brick.position.set(j, i, k-1-draw);
                 scene.add(brick);
@@ -378,6 +383,7 @@ function setUpBricks() {
                 curr-=curr2by8*4;
                 // Draw
                 for (var draw = 0; draw < curr2by8; draw++) {
+                  var material = new THREE.MeshLambertMaterial({color:0x0259df});
                   var brick = new THREE.Mesh(geo8by2, material);
                   brick.position.set(j-2.5-(draw*4)-curr, i, k);
                   scene.add(brick);
@@ -401,6 +407,7 @@ function setUpBricks() {
                 curr-=curr2by6*3; //?
                 // Draw
                 for (var draw = 0; draw < curr2by6; draw++) {
+                  var material = new THREE.MeshLambertMaterial({color:0x0259df});
                   var brick = new THREE.Mesh(geo6by2, material);
                   brick.position.set(j-2-(draw*3)-curr, i, k);
                   scene.add(brick);
@@ -425,6 +432,7 @@ function setUpBricks() {
                 curr-=curr2by4*2;
                 // Draw
                 for (var draw = 0; draw < curr2by4; draw++) {
+                  var material = new THREE.MeshLambertMaterial({color:0x0259df});
                   var brick = new THREE.Mesh(geo4by2, material);
                   brick.position.set(j-1.5-(draw*2)-curr, i, k);
                   scene.add(brick);
@@ -434,6 +442,7 @@ function setUpBricks() {
 
             if (curr > 0) { // Fill remaining spots with single bricks
               for (var draw = 0; draw < curr; draw++) {
+                var material = new THREE.MeshLambertMaterial({color:0x0259df});
                 var brick = new THREE.Mesh(geometry, material);
                 brick.position.set(j-1-draw, i, k);
                 scene.add(brick);
@@ -454,7 +463,7 @@ function setUpBricks() {
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(window.innerWidth, window.innerHeight);				
 }
 
 function animate() {
@@ -465,11 +474,47 @@ function animate() {
 
 function render() {
   controls.update();
+
+  // Be able to select bricks
+  // raycasterSelect.setFromCamera(mouse, camera);
+  // var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
+  // if ( intersectsBrick.length > 0 ) {
+  //   if (INTERSECTED != intersectsBrick[0].object) {
+  //     INTERSECTED = intersectsBrick[0].object;
+  //   console.log(INTERSECTED);
+  //     INTERSECTED.material.color.set(0xff0000);   
+  //   // INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+
+  //   }
+  // }
+
   renderer.render(scene, camera);
 }
 
+function onDocumentMouseMove( event ) {
+  event.preventDefault();
+  mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+  mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+}
+
 function onDocumentMouseDown(event) {
-  
+  event.preventDefault();
+  mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+  mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+  raycasterSelect.setFromCamera(mouse, camera);
+  var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
+  if ( intersectsBrick.length > 0 ) {
+    if (INTERSECTED != intersectsBrick[0].object) {
+      if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+      INTERSECTED = intersectsBrick[ 0 ].object;
+      INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+      INTERSECTED.material.emissive.setHex( 0xff0000 );
+    } else {
+      if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+      INTERSECTED = null;
+    }
+  }
 }
 
 function handleKeyDown(event) {

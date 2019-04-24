@@ -12,7 +12,7 @@ var OBJLoader = require('./OBJLoader.js');
 // Set Up
 var container, stats;
 var camera, controls, scene, renderer, raycaster, raycasterSelect;
-var mouse = new THREE.Vector2(),INTERSECTED;
+var mouse = new THREE.Vector2(),INTERSECTED,SELECTED;
 var loader = new THREE.OBJLoader();
 
 var mapLayers = new Map();
@@ -74,18 +74,17 @@ num2by8 = vocab.TwoByEight;
 
 // Set up camera, scene
 camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 20000);
-camera.position.set(20, 20, 20);
+camera.position.set(30, 30, 30);
 controls = new THREE.OrbitControls(camera); // Move through scene with mouse and arrow keys
 controls.update();
 controls.enablePan = true;
 controls.enableZoom = true;
 controls.keyPanSpeed = 15.0;
 scene.background = new THREE.Color(0xc5ecf9);
-scene.add(new THREE.AxesHelper(20));
+// scene.add(new THREE.AxesHelper(20));
 
 // For brick selection
 var material = new THREE.MeshLambertMaterial({color:0x0259df});
-
 
 // Lights!
 var ambientLight = new THREE.AmbientLight( 0xcccccc );
@@ -495,13 +494,21 @@ function onDocumentMouseMove( event ) {
   event.preventDefault();
   mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
   mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-}
-
-function onDocumentMouseDown(event) {
-  event.preventDefault();
-  mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-  mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
+  // raycasterSelect.setFromCamera(mouse, camera);
+  // var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
+  // if ( intersectsBrick.length > 0 ) {
+  //   // if the closest object intersected is not the currently stored intersection object
+  //   if (SELECTED != intersectsBrick[0].object) {
+  //     // restore previous intersection object (if it exists) to its original color
+  //     if ( SELECTED ) SELECTED.material.emissive.setHex( SELECTED.currentHex );
+  //     SELECTED = intersectsBrick[ 0 ].object;
+  //     SELECTED.currentHex = SELECTED.material.emissive.getHex();
+  //     SELECTED.material.emissive.setHex( 0xff0000 );
+  //   } else {
+  //     if ( SELECTED ) SELECTED.material.emissive.setHex( SELECTED.currentHex );
+  //     SELECTED = null;
+  //   }
+  // }
   raycasterSelect.setFromCamera(mouse, camera);
   var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
   if ( intersectsBrick.length > 0 ) {
@@ -510,11 +517,31 @@ function onDocumentMouseDown(event) {
       INTERSECTED = intersectsBrick[ 0 ].object;
       INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
       INTERSECTED.material.emissive.setHex( 0xff0000 );
-    } else {
-      if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-      INTERSECTED = null;
     }
+  } else {
+    if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+    INTERSECTED = null;
   }
+}
+
+function onDocumentMouseDown(event) {
+  event.preventDefault();
+  mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+  mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+  // raycasterSelect.setFromCamera(mouse, camera);
+  // var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
+  // if ( intersectsBrick.length > 0 ) {
+  //   if (INTERSECTED != intersectsBrick[0].object) {
+  //     if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+  //     INTERSECTED = intersectsBrick[ 0 ].object;
+  //     INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+  //     INTERSECTED.material.emissive.setHex( 0xff0000 );
+  //   }
+  // } else {
+  //   if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+  //   INTERSECTED = null;
+  // }
 }
 
 function handleKeyDown(event) {

@@ -510,20 +510,6 @@ function animate() {
 
 function render() {
   controls.update();
-
-  // Be able to select bricks
-  // raycasterSelect.setFromCamera(mouse, camera);
-  // var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
-  // if ( intersectsBrick.length > 0 ) {
-  //   if (INTERSECTED != intersectsBrick[0].object) {
-  //     INTERSECTED = intersectsBrick[0].object;
-  //   console.log(INTERSECTED);
-  //     INTERSECTED.material.color.set(0xff0000);   
-  //   // INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-
-  //   }
-  // }
-
   renderer.render(scene, camera);
 }
 

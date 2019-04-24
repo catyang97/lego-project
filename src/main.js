@@ -12,7 +12,7 @@ var OBJLoader = require('./OBJLoader.js');
 // Set Up
 var container, stats;
 var camera, controls, scene, renderer, raycaster, raycasterSelect;
-var mouse = new THREE.Vector2(),INTERSECTED,SELECTED;
+var mouse = new THREE.Vector2(),INTERSECTED;
 var loader = new THREE.OBJLoader();
 
 var mapLayers = new Map();
@@ -494,32 +494,26 @@ function onDocumentMouseMove( event ) {
   event.preventDefault();
   mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
   mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-  // raycasterSelect.setFromCamera(mouse, camera);
-  // var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
-  // if ( intersectsBrick.length > 0 ) {
-  //   // if the closest object intersected is not the currently stored intersection object
-  //   if (SELECTED != intersectsBrick[0].object) {
-  //     // restore previous intersection object (if it exists) to its original color
-  //     if ( SELECTED ) SELECTED.material.emissive.setHex( SELECTED.currentHex );
-  //     SELECTED = intersectsBrick[ 0 ].object;
-  //     SELECTED.currentHex = SELECTED.material.emissive.getHex();
-  //     SELECTED.material.emissive.setHex( 0xff0000 );
-  //   } else {
-  //     if ( SELECTED ) SELECTED.material.emissive.setHex( SELECTED.currentHex );
-  //     SELECTED = null;
-  //   }
-  // }
+
   raycasterSelect.setFromCamera(mouse, camera);
+  // create an array containing all objects in the scene with which the ray intersects
   var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
   if ( intersectsBrick.length > 0 ) {
+    // if the closest object intersected is not the currently stored intersection object
     if (INTERSECTED != intersectsBrick[0].object) {
+      // restore previous intersection object (if it exists) to its original color
       if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+      // store reference to closest object as current intersection object
       INTERSECTED = intersectsBrick[ 0 ].object;
+      // store color of closest object (for later restoration)
       INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+      // set a new color for closest object
       INTERSECTED.material.emissive.setHex( 0xff0000 );
     }
   } else {
+    // restore previous intersection object (if it exists) to its original color
     if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+    // remove previous intersection object reference
     INTERSECTED = null;
   }
 }

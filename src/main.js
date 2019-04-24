@@ -21,6 +21,8 @@ var positionOffsets = new Array(3);
 var gui;
 scene = new THREE.Scene();
 
+var runProgram = false;
+
 // Info from OBJ
 // var objVertices = [];
 var objMin, objMax, objSize;
@@ -55,27 +57,44 @@ stats = new Stats();
 container.appendChild( stats.dom );
 container.appendChild(renderer.domElement);
 
-gui = new dat.GUI();
+gui = new dat.gui.GUI();
 var vocab = {
-  TwoByTwo: 200,
-  TwoByThree: 200,
+  // TwoByTwo: 200,
+  // TwoByThree: '200',
   TwoByFour: 200,
   TwoBySix: 200,
   TwoByEight: 200
 };
 
-num2by2 = vocab.TwoByTwo;
-num2by3 = vocab.TwoByThree;
-num2by4 = vocab.TwoByFour;
-num2by6 = vocab.TwoBySix;
-num2by8 = vocab.TwoByEight;
+// num2by2 = Number(vocab.TwoByTwo);
+// num2by3 = Number(vocab.TwoByThree);
+num2by4 = Number(vocab.TwoByFour);
+num2by6 = Number(vocab.TwoBySix);
+num2by8 = Number(vocab.TwoByEight);
 
-// TODO: add numbers to gui
+// TODO: add numbers and controls to gui
+gui.add(vocab, 'TwoByFour', 0, 500).step(5).onChange(function(newVal) {
+  num2by4 = Number(vocab.TwoByFour);
+});
+gui.add(vocab, 'TwoBySix', 0, 500).step(5).onChange(function(newVal) {
+  num2by6 = Number(vocab.TwoBySix);
+});
+gui.add(vocab, 'TwoByEight', 0, 500).step(5).onChange(function(newVal) {
+  num2by8 = Number(vocab.TwoByEight);
+});
+
+var startButton = {START:function() { 
+  console.log("clicked") ;
+  runProgram = true;
+  setUpBricks();
+}};
+gui.add(startButton,'START');
+
 
 // Set up camera, scene
 camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 20000);
 camera.position.set(30, 30, 30);
-controls = new THREE.OrbitControls(camera); // Move through scene with mouse and arrow keys
+controls = new THREE.OrbitControls(camera, renderer.domElement); // Move through scene with mouse and arrow keys
 controls.update();
 controls.enablePan = true;
 controls.enableZoom = true;
@@ -107,6 +126,7 @@ animate();
 
 
 // Load a resource- from three.js docs
+// if (runProgram) {
 loader.load(
 	// Resource URL
   'https://raw.githubusercontent.com/catyang97/lego-project/master/src/baymax.obj',
@@ -228,7 +248,7 @@ loader.load(
         //   objVertices.push(vector);
         // }
       }
-      setUpBricks();
+      // setUpBricks();
     });
 	},
 	// called when loading is in progresses
@@ -240,6 +260,7 @@ loader.load(
 		console.log('An error happened');
 	}
 );
+// }
 
 // loader.onLoadComplete = function () {
 //   // console.log(positionOffsets[0]);
@@ -247,8 +268,8 @@ loader.load(
 // }
 
 function setUpBricks() {
-  console.log(mapLayers);
-  console.log(mapLayersOdd);
+  // console.log(mapLayers);
+  // console.log(mapLayersOdd);
   // loadScene();
   // animate();
 
@@ -262,7 +283,7 @@ function setUpBricks() {
         var zArray = xzArray[j];
         var curr = 0;
         var curr2by3, curr2by4, curr2by6, curr2by8, curr2by2 = 0;
-
+        console.log(num2by8);
         for (var k = startZ; k < endZ+1; k++) {
           if (zArray[k] === 2 && k < endZ) {
             curr++;
@@ -508,7 +529,7 @@ function onDocumentMouseMove( event ) {
       // store color of closest object (for later restoration)
       INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
       // set a new color for closest object
-      INTERSECTED.material.emissive.setHex( 0xff0000 );
+      INTERSECTED.material.emissive.setHex(0xff0000);
     }
   } else {
     // restore previous intersection object (if it exists) to its original color

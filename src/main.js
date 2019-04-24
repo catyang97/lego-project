@@ -17,7 +17,12 @@ var loader = new THREE.OBJLoader();
 
 var mapLayers = new Map();
 var mapLayersOdd = new Map();
-var positionOffsets = new Array(3);
+
+// TODO: be able to 
+var mapLayersBackup = new Map();
+var mapLayersOddBackup = new Map();
+
+// var positionOffsets = new Array(3);
 var gui;
 scene = new THREE.Scene();
 
@@ -43,6 +48,9 @@ var geo4by2 = new THREE.BoxBufferGeometry(2, 1, 1);
 var geo6by2 = new THREE.BoxBufferGeometry(3, 1, 1);
 var geo8by2 = new THREE.BoxBufferGeometry(4, 1, 1);
 
+// Modes
+var mode;
+
 // loadScene();
 // animate();
 
@@ -54,42 +62,8 @@ renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 stats = new Stats();
-container.appendChild( stats.dom );
+container.appendChild(stats.dom);
 container.appendChild(renderer.domElement);
-
-gui = new dat.gui.GUI();
-var vocab = {
-  // TwoByTwo: 200,
-  // TwoByThree: '200',
-  TwoByFour: 200,
-  TwoBySix: 200,
-  TwoByEight: 200
-};
-
-// num2by2 = Number(vocab.TwoByTwo);
-// num2by3 = Number(vocab.TwoByThree);
-num2by4 = Number(vocab.TwoByFour);
-num2by6 = Number(vocab.TwoBySix);
-num2by8 = Number(vocab.TwoByEight);
-
-// TODO: add numbers and controls to gui
-gui.add(vocab, 'TwoByFour', 0, 500).step(5).onChange(function(newVal) {
-  num2by4 = Number(vocab.TwoByFour);
-});
-gui.add(vocab, 'TwoBySix', 0, 500).step(5).onChange(function(newVal) {
-  num2by6 = Number(vocab.TwoBySix);
-});
-gui.add(vocab, 'TwoByEight', 0, 500).step(5).onChange(function(newVal) {
-  num2by8 = Number(vocab.TwoByEight);
-});
-
-var startButton = {START:function() { 
-  console.log("clicked") ;
-  runProgram = true;
-  setUpBricks();
-}};
-gui.add(startButton,'START');
-
 
 // Set up camera, scene
 camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 20000);
@@ -101,6 +75,46 @@ controls.enableZoom = true;
 controls.keyPanSpeed = 15.0;
 scene.background = new THREE.Color(0xc5ecf9);
 // scene.add(new THREE.AxesHelper(20));
+
+gui = new dat.gui.GUI();
+var vocab = {
+  // TwoByTwo: 200,
+  // TwoByThree: '200',
+  TwoByFour: '200',
+  TwoBySix: '200',
+  TwoByEight: '200',
+  Mode: 'Build'
+};
+
+// num2by2 = Number(vocab.TwoByTwo);
+// num2by3 = Number(vocab.TwoByThree);
+num2by4 = Number(vocab.TwoByFour);
+num2by6 = Number(vocab.TwoBySix);
+num2by8 = Number(vocab.TwoByEight);
+mode = vocab.Mode;
+
+// TODO: add numbers and controls to gui
+gui.add(vocab, 'TwoByFour').onChange(function(newVal) {
+  num2by4 = Number(vocab.TwoByFour);
+});
+gui.add(vocab, 'TwoBySix').onChange(function(newVal) {
+  num2by6 = Number(vocab.TwoBySix);
+});
+gui.add(vocab, 'TwoByEight').onChange(function(newVal) {
+  num2by8 = Number(vocab.TwoByEight);
+});
+
+var startButton = {START:function() { 
+  console.log("clicked") ;
+  runProgram = true;
+  setUpBricks();
+}};
+gui.add(startButton,'START');
+
+gui.add(vocab, 'Mode', /*{Build: 'Build', Delete: 'Delete'}*/['Build', 'Delete']).onChange(function(value) {
+  console.log(vocab.Mode);
+  mode = vocab.Mode;
+});
 
 // For brick selection
 var material = new THREE.MeshLambertMaterial({color:0x0259df});
@@ -149,9 +163,9 @@ loader.load(
         endY = Math.ceil(objMax.y);
         startZ = Math.floor(objMin.z);
         endZ = Math.ceil(objMax.z);
-        positionOffsets[0] = startX;
-        positionOffsets[1] = startY;
-        positionOffsets[2] = startZ;
+        // positionOffsets[0] = startX;
+        // positionOffsets[1] = startY;
+        // positionOffsets[2] = startZ;
         var xSize = endX - startX;
         // console.log('here');
         var rem = ((objMax.x-objMin.x)/2.0)%1;
@@ -272,6 +286,9 @@ function setUpBricks() {
   // console.log(mapLayersOdd);
   // loadScene();
   // animate();
+  console.log(num2by8);
+  console.log(num2by6);
+  console.log(num2by4);
 
   for (var i = startY; i < endY; i++) {
     var xzArray = mapLayers.get(i);
@@ -283,7 +300,6 @@ function setUpBricks() {
         var zArray = xzArray[j];
         var curr = 0;
         var curr2by3, curr2by4, curr2by6, curr2by8, curr2by2 = 0;
-        console.log(num2by8);
         for (var k = startZ; k < endZ+1; k++) {
           if (zArray[k] === 2 && k < endZ) {
             curr++;
@@ -512,7 +528,7 @@ function render() {
 }
 
 function onDocumentMouseMove( event ) {
-  event.preventDefault();
+  // event.preventDefault();
   mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
   mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
@@ -540,7 +556,7 @@ function onDocumentMouseMove( event ) {
 }
 
 function onDocumentMouseDown(event) {
-  event.preventDefault();
+  // event.preventDefault();
   mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
   mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 

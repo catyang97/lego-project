@@ -84,7 +84,7 @@ var vocab = {
   TwoByFour: '200',
   TwoBySix: '200',
   TwoByEight: '200',
-  Color: [2.0, 89.0, 223.0],
+  Color: 0x0259df,
 
   Mode: 'Navigate'
 };
@@ -106,7 +106,7 @@ gui.add(vocab, 'TwoBySix').onChange(function(newVal) {
 gui.add(vocab, 'TwoByEight').onChange(function(newVal) {
   num2by8 = Number(vocab.TwoByEight);
 });
-// gui.addColor(vocab, 'Color');
+gui.addColor(vocab, 'Color');
 var startButton = {BUILD:function() { 
   console.log("clicked") ;
   runProgram = true;
@@ -115,7 +115,6 @@ var startButton = {BUILD:function() {
 gui.add(startButton,'BUILD');
 
 gui.add(vocab, 'Mode', ['Navigate', 'Build', 'Delete']).onChange(function(value) {
-  console.log(vocab.Mode);
   mode = vocab.Mode;
   if (mode === 'Build') {
     brickFolder.open();
@@ -127,7 +126,7 @@ var types = {
   TwoByFour: false,
   TwoBySix: false,
   TwoByEight: false,
-  Color: [2.0, 89.0, 223.0]
+  Color: 0x0259df
 };
 var brickFolder = gui.addFolder('Brick Types');
 brickFolder.add(types, 'TwoByTwo');
@@ -137,7 +136,7 @@ brickFolder.add(types, 'TwoByEight');
 brickFolder.addColor(types, 'Color');
 
 // For brick selection
-var material = new THREE.MeshLambertMaterial({color:0x0259df});
+var material = new THREE.MeshLambertMaterial({color:vocab.Color});
 
 var rollOverGeo = new THREE.BoxBufferGeometry( 1, 1, 1 );
 rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
@@ -346,9 +345,7 @@ function setUpBricks() {
                 curr-=curr2by8*4;
                 // Draw
                 for (var draw = 0; draw < curr2by8; draw++) {
-                  // var newColor = "rgb("+vocab.Color[0]+","+vocab.Color[1]+","+vocab.Color[2]+")";
-                  // var newColor = new THREE.Color(vocab.Color[0], vocab.Color[1], vocab.Color[2]);
-                  var material = new THREE.MeshLambertMaterial({color:0x0259df});
+                  var material = new THREE.MeshLambertMaterial({color:vocab.Color});
                   var brick = new THREE.Mesh(geo2by8, material);
                   brick.position.set(j, i, k-2.5-(draw*4)-curr);
                   scene.add(brick);
@@ -369,10 +366,10 @@ function setUpBricks() {
                 for (var renum = startK; renum < endK; renum++) {
                   zArray[renum] = 6;
                 }
-                curr-=curr2by6*3; //?
+                curr-=curr2by6*3;
                 // Draw
                 for (var draw = 0; draw < curr2by6; draw++) {
-                  var material = new THREE.MeshLambertMaterial({color:0x0259df});
+                  var material = new THREE.MeshLambertMaterial({color:vocab.Color});
                   var brick = new THREE.Mesh(geo2by6, material);
                   brick.position.set(j, i, k-2-(draw*3)-curr);
                   scene.add(brick);
@@ -397,7 +394,7 @@ function setUpBricks() {
                 curr-=curr2by4*2;
                 // Draw
                 for (var draw = 0; draw < curr2by4; draw++) {
-                  var material = new THREE.MeshLambertMaterial({color:0x0259df});
+                  var material = new THREE.MeshLambertMaterial({color:vocab.Color});
                   var brick = new THREE.Mesh(geo2by4, material);
                   brick.position.set(j, i, k-1.5-(draw*2)-curr);
                   scene.add(brick);
@@ -407,7 +404,7 @@ function setUpBricks() {
 
             if (curr > 0) { // Fill remaining spots with single bricks
               for (var draw = 0; draw < curr; draw++) {
-                var material = new THREE.MeshLambertMaterial({color:0x0259df});
+                var material = new THREE.MeshLambertMaterial({color:vocab.Color});
                 var brick = new THREE.Mesh(geometry, material);
                 brick.position.set(j, i, k-1-draw);
                 scene.add(brick);
@@ -446,7 +443,7 @@ function setUpBricks() {
                 curr-=curr2by8*4;
                 // Draw
                 for (var draw = 0; draw < curr2by8; draw++) {
-                  var material = new THREE.MeshLambertMaterial({color:0x0259df});
+                  var material = new THREE.MeshLambertMaterial({color:vocab.Color});
                   var brick = new THREE.Mesh(geo8by2, material);
                   brick.position.set(j-2.5-(draw*4)-curr, i, k);
                   scene.add(brick);
@@ -467,10 +464,10 @@ function setUpBricks() {
                 for (var renum = startJ; renum < endJ; renum++) {
                   xArray[renum] = 6;
                 }
-                curr-=curr2by6*3; //?
+                curr-=curr2by6*3;
                 // Draw
                 for (var draw = 0; draw < curr2by6; draw++) {
-                  var material = new THREE.MeshLambertMaterial({color:0x0259df});
+                  var material = new THREE.MeshLambertMaterial({color:vocab.Color});
                   var brick = new THREE.Mesh(geo6by2, material);
                   brick.position.set(j-2-(draw*3)-curr, i, k);
                   scene.add(brick);
@@ -495,7 +492,7 @@ function setUpBricks() {
                 curr-=curr2by4*2;
                 // Draw
                 for (var draw = 0; draw < curr2by4; draw++) {
-                  var material = new THREE.MeshLambertMaterial({color:0x0259df});
+                  var material = new THREE.MeshLambertMaterial({color:vocab.Color});
                   var brick = new THREE.Mesh(geo4by2, material);
                   brick.position.set(j-1.5-(draw*2)-curr, i, k);
                   scene.add(brick);
@@ -505,7 +502,7 @@ function setUpBricks() {
 
             if (curr > 0) { // Fill remaining spots with single bricks
               for (var draw = 0; draw < curr; draw++) {
-                var material = new THREE.MeshLambertMaterial({color:0x0259df});
+                var material = new THREE.MeshLambertMaterial({color:vocab.Color});
                 var brick = new THREE.Mesh(geometry, material);
                 brick.position.set(j-1-draw, i, k);
                 scene.add(brick);
@@ -575,7 +572,6 @@ function onDocumentMouseDown(event) {
 
   // Clicking on blocks
   raycasterSelect.setFromCamera(mouse, camera);
-  console.log(mode);
   var intersects = raycasterSelect.intersectObjects(scene.children);
   if (intersects.length > 0) {
     if (SELECTED != intersects[0].object) {
@@ -584,6 +580,7 @@ function onDocumentMouseDown(event) {
         scene.remove(SELECTED);
       } else if (mode === 'Build') {
         var selPos = SELECTED.position;
+        // Choose to put a block below or above?
 
       }
     }

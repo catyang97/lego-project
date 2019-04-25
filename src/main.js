@@ -12,13 +12,14 @@ var OBJLoader = require('./OBJLoader.js');
 // Set Up
 var container, stats;
 var camera, controls, scene, renderer, raycaster, raycasterSelect;
-var mouse = new THREE.Vector2(),INTERSECTED;
+var mouse = new THREE.Vector2(),INTERSECTED, SELECTED, NEW;
 var loader = new THREE.OBJLoader();
+var rollOverMesh, rollOverMaterial;
 
 var mapLayers = new Map();
 var mapLayersOdd = new Map();
 
-// TODO: be able to 
+// TODO: be able to save original map so we can reload bricks with different numbers
 var mapLayersBackup = new Map();
 var mapLayersOddBackup = new Map();
 
@@ -83,7 +84,9 @@ var vocab = {
   TwoByFour: '200',
   TwoBySix: '200',
   TwoByEight: '200',
-  Mode: 'Build'
+  Color: [2.0, 89.0, 223.0],
+
+  Mode: 'Navigate'
 };
 
 // num2by2 = Number(vocab.TwoByTwo);
@@ -103,21 +106,43 @@ gui.add(vocab, 'TwoBySix').onChange(function(newVal) {
 gui.add(vocab, 'TwoByEight').onChange(function(newVal) {
   num2by8 = Number(vocab.TwoByEight);
 });
-
-var startButton = {START:function() { 
+// gui.addColor(vocab, 'Color');
+var startButton = {BUILD:function() { 
   console.log("clicked") ;
   runProgram = true;
   setUpBricks();
 }};
-gui.add(startButton,'START');
+gui.add(startButton,'BUILD');
 
-gui.add(vocab, 'Mode', /*{Build: 'Build', Delete: 'Delete'}*/['Build', 'Delete']).onChange(function(value) {
+gui.add(vocab, 'Mode', ['Navigate', 'Build', 'Delete']).onChange(function(value) {
   console.log(vocab.Mode);
   mode = vocab.Mode;
+  if (mode === 'Build') {
+    brickFolder.open();
+  }
 });
+
+var types = {
+  TwoByTwo: true,
+  TwoByFour: false,
+  TwoBySix: false,
+  TwoByEight: false,
+  Color: [2.0, 89.0, 223.0]
+};
+var brickFolder = gui.addFolder('Brick Types');
+brickFolder.add(types, 'TwoByTwo');
+brickFolder.add(types, 'TwoByFour');
+brickFolder.add(types, 'TwoBySix');
+brickFolder.add(types, 'TwoByEight');
+brickFolder.addColor(types, 'Color');
 
 // For brick selection
 var material = new THREE.MeshLambertMaterial({color:0x0259df});
+
+var rollOverGeo = new THREE.BoxBufferGeometry( 1, 1, 1 );
+rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
+rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
+// scene.add( rollOverMesh );
 
 // Lights!
 var ambientLight = new THREE.AmbientLight( 0xcccccc );
@@ -321,6 +346,8 @@ function setUpBricks() {
                 curr-=curr2by8*4;
                 // Draw
                 for (var draw = 0; draw < curr2by8; draw++) {
+                  // var newColor = "rgb("+vocab.Color[0]+","+vocab.Color[1]+","+vocab.Color[2]+")";
+                  // var newColor = new THREE.Color(vocab.Color[0], vocab.Color[1], vocab.Color[2]);
                   var material = new THREE.MeshLambertMaterial({color:0x0259df});
                   var brick = new THREE.Mesh(geo2by8, material);
                   brick.position.set(j, i, k-2.5-(draw*4)-curr);
@@ -546,6 +573,21 @@ function onDocumentMouseDown(event) {
   mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
   mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
+  // Clicking on blocks
+  raycasterSelect.setFromCamera(mouse, camera);
+  console.log(mode);
+  var intersects = raycasterSelect.intersectObjects(scene.children);
+  if (intersects.length > 0) {
+    if (SELECTED != intersects[0].object) {
+      SELECTED = intersects[0].object;
+      if (mode == 'Delete') {
+        scene.remove(SELECTED);
+      } else if (mode === 'Build') {
+        var selPos = SELECTED.position;
+
+      }
+    }
+  }
   // raycasterSelect.setFromCamera(mouse, camera);
   // var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
   // if ( intersectsBrick.length > 0 ) {

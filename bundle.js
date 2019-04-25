@@ -67,7 +67,7 @@
 	var mapLayers = new Map();
 	var mapLayersOdd = new Map();
 	
-	// TODO: be able to 
+	// TODO: be able to save original map so we can reload bricks with different numbers
 	var mapLayersBackup = new Map();
 	var mapLayersOddBackup = new Map();
 	
@@ -132,7 +132,7 @@
 	  TwoByFour: '200',
 	  TwoBySix: '200',
 	  TwoByEight: '200',
-	  Mode: 'Build'
+	  Mode: 'Navigate'
 	};
 	
 	// num2by2 = Number(vocab.TwoByTwo);
@@ -160,7 +160,7 @@
 	  } };
 	gui.add(startButton, 'START');
 	
-	gui.add(vocab, 'Mode', /*{Build: 'Build', Delete: 'Delete'}*/['Build', 'Delete']).onChange(function (value) {
+	gui.add(vocab, 'Mode', ['Navigate', 'Build', 'Delete']).onChange(function (value) {
 	  console.log(vocab.Mode);
 	  mode = vocab.Mode;
 	});
@@ -611,6 +611,21 @@
 	  mouse.x = event.clientX / window.innerWidth * 2 - 1;
 	  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 	
+	  // Clicking on blocks
+	  raycaster.setFromCamera(mouse, camera);
+	  var intersects = raycaster.intersectObjects(scene.children);
+	  if (intersects.length > 0) {
+	    if (INTERSECTED != intersects[0].object) {
+	      INTERSECTED = intersects[0].object;
+	      if (mode === 'Delete') {
+	        scene.remove(INTERSECTED);
+	      }
+	      if (createKey) {
+	        // Choose brick type
+	        var intPos = INTERSECTED.position;
+	      }
+	    }
+	  }
 	  // raycasterSelect.setFromCamera(mouse, camera);
 	  // var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
 	  // if ( intersectsBrick.length > 0 ) {

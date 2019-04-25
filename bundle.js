@@ -59,13 +59,15 @@
 	
 	// Set Up
 	var container, stats;
-	var camera, controls, scene, renderer, raycaster, raycasterSelect;
+	var camera, controls, scene, renderer, raycaster, raycasterSelect, raycasterCheck;
 	var mouse = new THREE.Vector2(),
 	    INTERSECTED,
 	    SELECTED,
 	    NEW;
 	var loader = new THREE.OBJLoader();
-	var rollOverMesh, rollOverMaterial;
+	var upKey = false,
+	    downKey = false,
+	    deleteKey = false;
 	
 	var mapLayers = new Map();
 	var mapLayersOdd = new Map();
@@ -88,6 +90,7 @@
 	
 	raycaster = new THREE.Raycaster();
 	raycasterSelect = new THREE.Raycaster();
+	raycasterCheck = new THREE.Raycaster();
 	
 	// Different brick shapes
 	var geometry = new THREE.BoxBufferGeometry(1, 1, 1);
@@ -102,6 +105,7 @@
 	
 	// Modes
 	var mode;
+	var currAdd = 'Two By Two'; // What type of brick we are adding right now
 	
 	// loadScene();
 	// animate();
@@ -169,6 +173,8 @@
 	  if (mode === 'Build') {
 	    brickFolder.open();
 	    scene.add(rollOverMesh);
+	  } else if (mode === 'Delete' || mode === 'Navigate') {
+	    brickFolder.close();
 	  }
 	});
 	
@@ -177,7 +183,9 @@
 	  Color: 0x0259df
 	};
 	var brickFolder = gui.addFolder('Bricks');
-	brickFolder.add(types, 'BrickType', ['Two By Two', 'Two By Four', 'Two By Six', 'Two By Eight']);
+	brickFolder.add(types, 'BrickType', ['Two By Two', 'Two By Four', 'Two By Six', 'Two By Eight', 'Four By Two', 'Six By Two', 'Eight By Two']).onChange(function (value) {
+	  currAdd = types.BrickType;
+	});
 	brickFolder.addColor(types, 'Color');
 	
 	// var material = new THREE.MeshLambertMaterial({color:vocab.Color});
@@ -189,22 +197,45 @@
 	// For brick selection
 	var material = new THREE.MeshLambertMaterial({ color: vocab.Color });
 	
-	var rollOverGeo = new THREE.BoxBufferGeometry(1, 1, 1);
+	var rollOverMesh, rollOverMesh24, rollOverMesh26, rollOverMesh28;
+	var rollOverMesh42, rollOverMesh62, rollOverMesh82, rollOverMaterial;
 	rollOverMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.5, transparent: true });
-	rollOverMesh = new THREE.Mesh(rollOverGeo, rollOverMaterial);
+	rollOverMesh = new THREE.Mesh(geometry, rollOverMaterial);
 	rollOverMesh.name = 'rollover';
 	rollOverMesh.position.set(20, 0, 0);
 	
-	// if (mode === 'Build') {
-	// scene.add( rollOverMesh );
-	// }
+	rollOverMesh24 = new THREE.Mesh(geo2by4, rollOverMaterial);
+	rollOverMesh24.name = 'rollover';
+	rollOverMesh24.position.set(20, 0, 0);
+	
+	rollOverMesh26 = new THREE.Mesh(geo2by6, rollOverMaterial);
+	rollOverMesh26.name = 'rollover';
+	rollOverMesh26.position.set(20, 0, 0);
+	
+	rollOverMesh28 = new THREE.Mesh(geo2by8, rollOverMaterial);
+	rollOverMesh28.name = 'rollover';
+	rollOverMesh28.position.set(20, 0, 0);
+	
+	rollOverMesh42 = new THREE.Mesh(geo4by2, rollOverMaterial);
+	rollOverMesh42.name = 'rollover';
+	rollOverMesh42.position.set(20, 0, 0);
+	
+	rollOverMesh62 = new THREE.Mesh(geo6by2, rollOverMaterial);
+	rollOverMesh62.name = 'rollover';
+	rollOverMesh62.position.set(20, 0, 0);
+	
+	rollOverMesh82 = new THREE.Mesh(geo8by2, rollOverMaterial);
+	rollOverMesh82.name = 'rollover';
+	rollOverMesh82.position.set(20, 0, 0);
 	
 	// Lights!
 	var ambientLight = new THREE.AmbientLight(0xcccccc);
+	ambientLight.castShadow = true;
 	scene.add(ambientLight);
 	
 	var directionalLight = new THREE.DirectionalLight(0xffffff);
 	directionalLight.position.set(20, 25, -15);
+	directionalLight.castShadow = true;
 	scene.add(directionalLight);
 	
 	// loadObj();
@@ -619,21 +650,30 @@
 	  var dir = vector.sub(camera.position).normalize();
 	  var distance = -camera.position.z / dir.z;
 	  var pos = camera.position.clone().add(dir.multiplyScalar(distance));
-	  rollOverMesh.position.copy(pos);
-	  rollOverMesh.position.divideScalar(1).floor().multiplyScalar(1);
 	
 	  raycasterSelect.setFromCamera(mouse, camera);
 	  // create an array containing all objects in the scene with which the ray intersects
 	  var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
 	  if (intersectsBrick.length > 0) {
-	    // var intersect = intersectsBrick[ 0 ];
-	
-	    // rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
-	    // rollOverMesh.position.divideScalar( 1 ).floor().multiplyScalar( 1 ).addScalar( 0.5 );
-	
 	    // if the closest object intersected is not the currently stored intersection object
 	    if (INTERSECTED != intersectsBrick[0].object) {
 	      if (intersectsBrick[0].object.name !== 'rollover') {
+	        if (currAdd === 'Two By Two') {
+	          scene.remove(rollOverMesh);
+	        } else if (currAdd === 'Two By Four') {
+	          scene.remove(rollOverMesh24);
+	        } else if (currAdd === 'Two By Six') {
+	          scene.remove(rollOverMesh26);
+	        } else if (currAdd === 'Two By Eight') {
+	          scene.remove(rollOverMesh28);
+	        } else if (currAdd === 'Four By Two') {
+	          scene.remove(rollOverMesh42);
+	        } else if (currAdd === 'Six By Two') {
+	          scene.remove(rollOverMesh62);
+	        } else if (currAdd === 'Eight By Two') {
+	          scene.remove(rollOverMesh82);
+	        }
+	
 	        // restore previous intersection object (if it exists) to its original color
 	        if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
 	        // store reference to closest object as current intersection object
@@ -649,6 +689,38 @@
 	    if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
 	    // remove previous intersection object reference
 	    INTERSECTED = null;
+	
+	    if (mode === 'Build') {
+	      if (currAdd === 'Two By Two') {
+	        rollOverMesh.position.copy(pos);
+	        rollOverMesh.position.divideScalar(1).floor().multiplyScalar(1);
+	        scene.add(rollOverMesh);
+	      } else if (currAdd === 'Two By Four') {
+	        rollOverMesh24.position.copy(pos);
+	        rollOverMesh24.position.divideScalar(1).floor().multiplyScalar(1);
+	        scene.add(rollOverMesh24);
+	      } else if (currAdd === 'Two By Six') {
+	        rollOverMesh26.position.copy(pos);
+	        rollOverMesh26.position.divideScalar(1).floor().multiplyScalar(1);
+	        scene.add(rollOverMesh26);
+	      } else if (currAdd === 'Two By Eight') {
+	        rollOverMesh28.position.copy(pos);
+	        rollOverMesh28.position.divideScalar(1).floor().multiplyScalar(1);
+	        scene.add(rollOverMesh28);
+	      } else if (currAdd === 'Four By Two') {
+	        rollOverMesh42.position.copy(pos);
+	        rollOverMesh42.position.divideScalar(1).floor().multiplyScalar(1);
+	        scene.add(rollOverMesh42);
+	      } else if (currAdd === 'Six By Two') {
+	        rollOverMesh62.position.copy(pos);
+	        rollOverMesh62.position.divideScalar(1).floor().multiplyScalar(1);
+	        scene.add(rollOverMesh62);
+	      } else if (currAdd === 'Eight By Two') {
+	        rollOverMesh82.position.copy(pos);
+	        rollOverMesh82.position.divideScalar(1).floor().multiplyScalar(1);
+	        scene.add(rollOverMesh82);
+	      }
+	    }
 	  }
 	}
 	
@@ -661,28 +733,118 @@
 	  raycasterSelect.setFromCamera(mouse, camera);
 	  var intersects = raycasterSelect.intersectObjects(scene.children);
 	  if (intersects.length > 0) {
+	    // console.log('hi');
+	    // console.log(intersects[0].object);
 	    if (SELECTED != intersects[0].object) {
 	      SELECTED = intersects[0].object;
 	      if (mode == 'Delete') {
-	        scene.remove(SELECTED);
+	        if (deleteKey) {
+	          scene.remove(SELECTED);
+	        }
 	      } else if (mode === 'Build') {
 	        var selPos = SELECTED.position;
 	        // Choose to put a block below or above?
 	
-	        // Decide the position depending on the type of block clicked
+	        // raycasterCheck.setFromCamera(mouse, camera);
+	        // var intersectsCheck = raycasterCheck.intersectObjects(scene.children);
+	        if (upKey) {
+	          var material = new THREE.MeshLambertMaterial({ color: types.Color });
+	          var brick = new THREE.Mesh(geometry, material);
+	          brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+	          scene.add(brick);
+	        }
+	        if (downKey) {
+	          var material = new THREE.MeshLambertMaterial({ color: types.Color });
+	          var brick = new THREE.Mesh(geometry, material);
+	          brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+	          scene.add(brick);
+	        }
+	
+	        // TODO: Decide the position depending on the type of block clicked
+	      }
+	    }
+	    if (intersects[0].object.name === 'rollover' && upKey) {
+	      console.log('please');
+	      var material = new THREE.MeshLambertMaterial({ color: types.Color });
+	      // var brick = new THREE.Mesh(geometry, material);
+	      // brick.position.set(rollOverMesh.position.x, rollOverMesh.position.y, rollOverMesh.position.z);
+	      // scene.add(brick);
+	
+	      if (currAdd === 'Two By Two') {
+	        var brick = new THREE.Mesh(geometry, material);
+	        brick.position.set(rollOverMesh.position.x, rollOverMesh.position.y, rollOverMesh.position.z);
+	        scene.add(brick);
+	      } else if (currAdd === 'Two By Four') {
+	        var brick = new THREE.Mesh(geo2by4, material);
+	        brick.position.set(rollOverMesh24.position.x, rollOverMesh24.position.y, rollOverMesh24.position.z);
+	        scene.add(brick);
+	      } else if (currAdd === 'Two By Six') {
+	        var brick = new THREE.Mesh(geo2by6, material);
+	        brick.position.set(rollOverMesh26.position.x, rollOverMesh26.position.y, rollOverMesh26.position.z);
+	        scene.add(brick);
+	      } else if (currAdd === 'Two By Eight') {
+	        var brick = new THREE.Mesh(geo2by8, material);
+	        brick.position.set(rollOverMesh28.position.x, rollOverMesh28.position.y, rollOverMesh28.position.z);
+	        scene.add(brick);
+	      } else if (currAdd === 'Four By Two') {
+	        var brick = new THREE.Mesh(geo4by2, material);
+	        brick.position.set(rollOverMesh42.position.x, rollOverMesh42.position.y, rollOverMesh42.position.z);
+	        scene.add(brick);
+	      } else if (currAdd === 'Six By Two') {
+	        var brick = new THREE.Mesh(geo6by2, material);
+	        brick.position.set(rollOverMesh62.position.x, rollOverMesh62.position.y, rollOverMesh62.position.z);
+	        scene.add(brick);
+	      } else if (currAdd === 'Eight By Two') {
+	        var brick = new THREE.Mesh(geo8by2, material);
+	        brick.position.set(rollOverMesh82.position.x, rollOverMesh82.position.y, rollOverMesh82.position.z);
+	        scene.add(brick);
+	      }
+	    }
+	  } else {
+	    if (mode === 'Build' && upKey) {
+	      // console.log(rollOverMesh.position);
+	      var material = new THREE.MeshLambertMaterial({ color: types.Color });
+	      if (currAdd === 'Two By Two') {
+	        var brick = new THREE.Mesh(geometry, material);
+	        brick.position.set(rollOverMesh.position.x, rollOverMesh.position.y, rollOverMesh.position.z);
+	        scene.add(brick);
+	      } else if (currAdd === 'Two By Four') {
+	        var brick = new THREE.Mesh(geo2by4, material);
+	        brick.position.set(rollOverMesh24.position.x, rollOverMesh24.position.y, rollOverMesh24.position.z);
+	        scene.add(brick);
+	      } else if (currAdd === 'Two By Six') {
+	        var brick = new THREE.Mesh(geo2by6, material);
+	        brick.position.set(rollOverMesh26.position.x, rollOverMesh26.position.y, rollOverMesh26.position.z);
+	        scene.add(brick);
+	      } else if (currAdd === 'Two By Eight') {
+	        var brick = new THREE.Mesh(geo2by8, material);
+	        brick.position.set(rollOverMesh28.position.x, rollOverMesh28.position.y, rollOverMesh28.position.z);
+	        scene.add(brick);
+	      } else if (currAdd === 'Four By Two') {
+	        var brick = new THREE.Mesh(geo4by2, material);
+	        brick.position.set(rollOverMesh42.position.x, rollOverMesh42.position.y, rollOverMesh42.position.z);
+	        scene.add(brick);
+	      } else if (currAdd === 'Six By Two') {
+	        var brick = new THREE.Mesh(geo6by2, material);
+	        brick.position.set(rollOverMesh62.position.x, rollOverMesh62.position.y, rollOverMesh62.position.z);
+	        scene.add(brick);
+	      } else if (currAdd === 'Eight By Two') {
+	        var brick = new THREE.Mesh(geo8by2, material);
+	        brick.position.set(rollOverMesh82.position.x, rollOverMesh82.position.y, rollOverMesh82.position.z);
+	        scene.add(brick);
 	      }
 	    }
 	  }
 	
 	  // TODO: Decide the position depending on the type of block clicked
 	  // TODO: Choose to put a block below or above?
-	  if (mode === 'Build') {
-	    console.log(rollOverMesh.position);
-	    var material = new THREE.MeshLambertMaterial({ color: types.Color });
-	    var brick = new THREE.Mesh(geometry, material);
-	    brick.position.set(rollOverMesh.position.x, rollOverMesh.position.y, rollOverMesh.position.z);
-	    scene.add(brick);
-	  }
+	  // if (mode === 'Build') {
+	  //   // console.log(rollOverMesh.position);
+	  //   var material = new THREE.MeshLambertMaterial({color:types.Color});
+	  //   var brick = new THREE.Mesh(geometry, material);
+	  //   brick.position.set(rollOverMesh.position.x, rollOverMesh.position.y, rollOverMesh.position.z);
+	  //   scene.add(brick);
+	  // }
 	  // raycasterSelect.setFromCamera(mouse, camera);
 	  // var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
 	  // if ( intersectsBrick.length > 0 ) {
@@ -698,13 +860,28 @@
 	  // }
 	}
 	
-	function handleKeyDown(event) {}
+	function handleKeyDown(event) {
+	  switch (event.keyCode) {
+	    case 87:
+	      upKey = true;
+	      break;
+	    case 83:
+	      downKey = true;
+	      break;
+	    case 68:
+	      deleteKey = true;
+	  }
+	}
 	
 	function onKeyDown(event) {
 	  handleKeyDown(event);
 	}
 	
-	function onKeyUp(event) {}
+	function onKeyUp(event) {
+	  upKey = false;
+	  downKey = false;
+	  deleteKey = false;
+	}
 
 /***/ }),
 /* 1 */

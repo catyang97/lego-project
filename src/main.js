@@ -67,8 +67,8 @@ container.appendChild(stats.dom);
 container.appendChild(renderer.domElement);
 
 // Set up camera, scene
-camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 20000);
-camera.position.set(30, 30, 30);
+camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 20000);
+camera.position.set(30, 20, 30);
 controls = new THREE.OrbitControls(camera, renderer.domElement); // Move through scene with mouse and arrow keys
 controls.update();
 controls.enablePan = true;
@@ -85,7 +85,6 @@ var vocab = {
   TwoBySix: '200',
   TwoByEight: '200',
   Color: 0x0259df,
-
   Mode: 'Navigate'
 };
 
@@ -118,22 +117,23 @@ gui.add(vocab, 'Mode', ['Navigate', 'Build', 'Delete']).onChange(function(value)
   mode = vocab.Mode;
   if (mode === 'Build') {
     brickFolder.open();
+    scene.add(rollOverMesh);
   }
 });
 
 var types = {
-  TwoByTwo: true,
-  TwoByFour: false,
-  TwoBySix: false,
-  TwoByEight: false,
+  BrickType: 'Two By Two',
   Color: 0x0259df
 };
-var brickFolder = gui.addFolder('Brick Types');
-brickFolder.add(types, 'TwoByTwo');
-brickFolder.add(types, 'TwoByFour');
-brickFolder.add(types, 'TwoBySix');
-brickFolder.add(types, 'TwoByEight');
+var brickFolder = gui.addFolder('Bricks');
+brickFolder.add(types, 'BrickType', ['Two By Two', 'Two By Four', 'Two By Six', 'Two By Eight']);
 brickFolder.addColor(types, 'Color');
+
+// var material = new THREE.MeshLambertMaterial({color:vocab.Color});
+// var brick = new THREE.Mesh(geo2by8, material);
+// brick.rotation.x = Math.PI / 2;
+// brick.position.set(20, 0, 0);
+// scene.add(brick);
 
 // For brick selection
 var material = new THREE.MeshLambertMaterial({color:vocab.Color});
@@ -141,7 +141,12 @@ var material = new THREE.MeshLambertMaterial({color:vocab.Color});
 var rollOverGeo = new THREE.BoxBufferGeometry( 1, 1, 1 );
 rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
 rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
-// scene.add( rollOverMesh );
+rollOverMesh.name = 'rollover';
+rollOverMesh.position.set(20, 0, 0);
+
+// if (mode === 'Build') {
+  // scene.add( rollOverMesh );
+// }
 
 // Lights!
 var ambientLight = new THREE.AmbientLight( 0xcccccc );
@@ -542,26 +547,44 @@ function onDocumentMouseMove( event ) {
   mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
   mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
+  var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+	vector.unproject( camera );
+	var dir = vector.sub( camera.position ).normalize();
+	var distance = - camera.position.z / dir.z;
+	var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
+  rollOverMesh.position.copy(pos);
+  rollOverMesh.position.divideScalar( 1 ).floor().multiplyScalar( 1 );
+  
   raycasterSelect.setFromCamera(mouse, camera);
   // create an array containing all objects in the scene with which the ray intersects
   var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
   if ( intersectsBrick.length > 0 ) {
+    // var intersect = intersectsBrick[ 0 ];
+
+    // rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
+    // rollOverMesh.position.divideScalar( 1 ).floor().multiplyScalar( 1 ).addScalar( 0.5 );
+
     // if the closest object intersected is not the currently stored intersection object
     if (INTERSECTED != intersectsBrick[0].object) {
-      // restore previous intersection object (if it exists) to its original color
-      if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-      // store reference to closest object as current intersection object
-      INTERSECTED = intersectsBrick[ 0 ].object;
-      // store color of closest object (for later restoration)
-      INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-      // set a new color for closest object
-      INTERSECTED.material.emissive.setHex(0xff0000);
+      if (intersectsBrick[0].object.name !== 'rollover') {
+        // restore previous intersection object (if it exists) to its original color
+        if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+        // store reference to closest object as current intersection object
+        INTERSECTED = intersectsBrick[ 0 ].object;
+        // store color of closest object (for later restoration)
+        INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+        // set a new color for closest object
+        INTERSECTED.material.emissive.setHex(0xff0000);
+      }
+
     }
   } else {
     // restore previous intersection object (if it exists) to its original color
     if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
     // remove previous intersection object reference
     INTERSECTED = null;
+
+
   }
 }
 
@@ -582,8 +605,19 @@ function onDocumentMouseDown(event) {
         var selPos = SELECTED.position;
         // Choose to put a block below or above?
 
+        // Decide the position depending on the type of block clicked
       }
     }
+  }
+
+  // TODO: Decide the position depending on the type of block clicked
+  // TODO: Choose to put a block below or above?
+  if (mode === 'Build') {
+    console.log(rollOverMesh.position);
+    var material = new THREE.MeshLambertMaterial({color:types.Color});
+    var brick = new THREE.Mesh(geometry, material);
+    brick.position.set(rollOverMesh.position.x, rollOverMesh.position.y, rollOverMesh.position.z);
+    scene.add(brick);
   }
   // raycasterSelect.setFromCamera(mouse, camera);
   // var intersectsBrick = raycasterSelect.intersectObjects(scene.children);

@@ -4,9 +4,9 @@ var Stats = require('./stats.min.js');
 var dat = require('./dat.gui.min.js');
 var OBJLoader = require('./OBJLoader.js');
 
-// if ( WEBGL.isWebGLAvailable() === false ) {
-//   document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-//   document.getElementById( 'container' ).innerHTML = "";
+// if (WEBGL.isWebGLAvailable() === false) {
+//   document.body.appendChild(WEBGL.getWebGLErrorMessage());
+//   document.getElementById('container').innerHTML = "";
 // }
 
 // Set Up
@@ -150,34 +150,27 @@ var rollOverMesh42, rollOverMesh62, rollOverMesh82, rollOverMaterial;
 rollOverMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, opacity: 0.5, transparent: true});
 rollOverMesh = new THREE.Mesh(geometry, rollOverMaterial);
 rollOverMesh.name = 'rollover';
-rollOverMesh.position.set(20, 0, 0);
 
 rollOverMesh24 = new THREE.Mesh(geo2by4, rollOverMaterial);
 rollOverMesh24.name = 'rollover';
-rollOverMesh24.position.set(20, 0, 0);
 
 rollOverMesh26 = new THREE.Mesh(geo2by6, rollOverMaterial);
 rollOverMesh26.name = 'rollover';
-rollOverMesh26.position.set(20, 0, 0);
 
 rollOverMesh28 = new THREE.Mesh(geo2by8, rollOverMaterial);
 rollOverMesh28.name = 'rollover';
-rollOverMesh28.position.set(20, 0, 0);
 
 rollOverMesh42 = new THREE.Mesh(geo4by2, rollOverMaterial);
 rollOverMesh42.name = 'rollover';
-rollOverMesh42.position.set(20, 0, 0);
 
 rollOverMesh62 = new THREE.Mesh(geo6by2, rollOverMaterial);
 rollOverMesh62.name = 'rollover';
-rollOverMesh62.position.set(20, 0, 0);
 
 rollOverMesh82 = new THREE.Mesh(geo8by2, rollOverMaterial);
 rollOverMesh82.name = 'rollover';
-rollOverMesh82.position.set(20, 0, 0);
 
 // Lights!
-var ambientLight = new THREE.AmbientLight( 0xcccccc );
+var ambientLight = new THREE.AmbientLight(0xcccccc);
 ambientLight.castShadow = true;
 scene.add(ambientLight);
 
@@ -186,20 +179,18 @@ directionalLight.position.set(20, 25, -15);
 directionalLight.castShadow = true;
 scene.add(directionalLight);
 
+
 // loadObj();
 // console.log(positionOffsets);
 
 document.addEventListener('mousedown', onDocumentMouseDown, false);
-document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+document.addEventListener('mousemove', onDocumentMouseMove, false);
 window.addEventListener('keydown', onKeyDown, false);
 window.addEventListener('keyup', onKeyUp, false);
 window.addEventListener('resize', onWindowResize, false);
-// }
 animate();
 
-
 // Load a resource- from three.js docs
-// if (runProgram) {
 loader.load(
 	// Resource URL
   'https://raw.githubusercontent.com/catyang97/lego-project/master/src/baymax.obj',
@@ -226,7 +217,6 @@ loader.load(
         // positionOffsets[1] = startY;
         // positionOffsets[2] = startZ;
         var xSize = endX - startX;
-        // console.log('here');
         var rem = ((objMax.x-objMin.x)/2.0)%1;
         rem = 0;
         for (var i = startY; i < endY; i++) {
@@ -333,7 +323,6 @@ loader.load(
 		console.log('An error happened');
 	}
 );
-// }
 
 // loader.onLoadComplete = function () {
 //   // console.log(positionOffsets[0]);
@@ -553,6 +542,12 @@ function setUpBricks() {
     mapLayers.set(i, xzArray); // Update the map with updated arrays
     mapLayers.set(i, zxArray);
   }
+  // var geometry1 = new THREE.PlaneGeometry( 100, 100, 100 );
+  // var material1 = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+  // var plane = new THREE.Mesh( geometry1, material1 );
+  // plane.position.set(0, startY, 0);
+  // plane.rotateX( - Math.PI / 2);
+  // scene.add( plane );
 }
 
 function onWindowResize() {
@@ -572,27 +567,27 @@ function render() {
   renderer.render(scene, camera);
 }
 
-function onDocumentMouseMove( event ) {
+function onDocumentMouseMove(event) {
   // event.preventDefault();
-  mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-  mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
   var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-	vector.unproject( camera );
-	var dir = vector.sub( camera.position ).normalize();
+	vector.unproject(camera);
+	var dir = vector.sub(camera.position).normalize();
 	var distance = - camera.position.z / dir.z;
-	var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
+	var pos = camera.position.clone().add(dir.multiplyScalar(distance));
   
   raycasterSelect.setFromCamera(mouse, camera);
   // create an array containing all objects in the scene with which the ray intersects
   var intersectsBrick = raycasterSelect.intersectObjects(scene.children);
-  if ( intersectsBrick.length > 0 ) {
+  if (intersectsBrick.length > 0) {
     // if the closest object intersected is not the currently stored intersection object
     if (INTERSECTED != intersectsBrick[0].object) {
       if (intersectsBrick[0].object.name !== 'rollover') {
         deleteRollovers();
         // restore previous intersection object (if it exists) to its original color
-        if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+        if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
         // store reference to closest object as current intersection object
         INTERSECTED = intersectsBrick[ 0 ].object;
         // store color of closest object (for later restoration)
@@ -604,7 +599,7 @@ function onDocumentMouseMove( event ) {
     }
   } else {
     // restore previous intersection object (if it exists) to its original color
-    if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+    if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
     // remove previous intersection object reference
     INTERSECTED = null;
 
@@ -612,31 +607,31 @@ function onDocumentMouseMove( event ) {
       deleteRollovers();
       if (currAdd === 'Two By Two') {
         rollOverMesh.position.copy(pos);
-        rollOverMesh.position.divideScalar( 1 ).floor().multiplyScalar( 1 );
+        rollOverMesh.position.divideScalar(1).floor().multiplyScalar(1);
         scene.add(rollOverMesh);      
       } else if (currAdd === 'Two By Four') {
         rollOverMesh24.position.copy(pos);
-        rollOverMesh24.position.divideScalar( 1 ).floor().multiplyScalar( 1 );
+        rollOverMesh24.position.divideScalar(1).floor().multiplyScalar(1);
         scene.add(rollOverMesh24);    
       } else if (currAdd === 'Two By Six') {
         rollOverMesh26.position.copy(pos);
-        rollOverMesh26.position.divideScalar( 1 ).floor().multiplyScalar( 1 );
+        rollOverMesh26.position.divideScalar(1).floor().multiplyScalar(1);
         scene.add(rollOverMesh26);
       } else if (currAdd === 'Two By Eight') {
         rollOverMesh28.position.copy(pos);
-        rollOverMesh28.position.divideScalar( 1 ).floor().multiplyScalar( 1 );
+        rollOverMesh28.position.divideScalar(1).floor().multiplyScalar(1);
         scene.add(rollOverMesh28);
       } else if (currAdd === 'Four By Two') {
         rollOverMesh42.position.copy(pos);
-        rollOverMesh42.position.divideScalar( 1 ).floor().multiplyScalar( 1 );
+        rollOverMesh42.position.divideScalar(1).floor().multiplyScalar(1);
         scene.add(rollOverMesh42);
       } else if (currAdd === 'Six By Two') {
         rollOverMesh62.position.copy(pos);
-        rollOverMesh62.position.divideScalar( 1 ).floor().multiplyScalar( 1 );
+        rollOverMesh62.position.divideScalar(1).floor().multiplyScalar(1);
         scene.add(rollOverMesh62);
       } else if (currAdd === 'Eight By Two') {
         rollOverMesh82.position.copy(pos);
-        rollOverMesh82.position.divideScalar( 1 ).floor().multiplyScalar( 1 );
+        rollOverMesh82.position.divideScalar(1).floor().multiplyScalar(1);
         scene.add(rollOverMesh82);
       }
     }
@@ -645,8 +640,8 @@ function onDocumentMouseMove( event ) {
 
 function onDocumentMouseDown(event) {
   // event.preventDefault();
-  mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-  mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
   // Clicking on blocks
   raycasterSelect.setFromCamera(mouse, camera);
@@ -662,31 +657,156 @@ function onDocumentMouseDown(event) {
         }
       } else if (mode === 'Build') {
         var selPos = SELECTED.position;
+        var depth = SELECTED.geometry.parameters.depth; // z
+        var width = SELECTED.geometry.parameters.width; // x
         // Choose to put a block below or above?
 
         // raycasterCheck.setFromCamera(mouse, camera);
         // var intersectsCheck = raycasterCheck.intersectObjects(scene.children);
         var material = new THREE.MeshLambertMaterial({color:types.Color});
 
-        if (upKey) {
-          var brick = new THREE.Mesh(geometry, material);
-          brick.position.set(selPos.x, selPos.y + 1, selPos.z);
-          scene.add(brick);
+        if (upKey && SELECTED.name !== 'rollover') {
+          // Multiple combinations
+          // TODO: can add in middle too?
+          if (depth === 1) { // in x direction or is 2 by 2
+            if (currAdd === 'Two By Two') {
+              var brick = new THREE.Mesh(geometry, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Two By Four') {
+              var brick = new THREE.Mesh(geo2by4, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Two By Six') {
+              var brick = new THREE.Mesh(geo2by6, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Two By Eight') {
+              var brick = new THREE.Mesh(geo2by8, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Four By Two') {
+              var brick = new THREE.Mesh(geo4by2, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Six By Two') {
+              var brick = new THREE.Mesh(geo6by2, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            } else {
+              var brick = new THREE.Mesh(geo8by2, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            }
+          } else { // in z direction
+            if (currAdd === 'Two By Two') {
+              var brick = new THREE.Mesh(geometry, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Two By Four') {
+              var brick = new THREE.Mesh(geo2by4, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Two By Six') {
+              var brick = new THREE.Mesh(geo2by6, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Two By Eight') {
+              var brick = new THREE.Mesh(geo2by8, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Four By Two') {
+              var brick = new THREE.Mesh(geo4by2, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Six By Two') {
+              var brick = new THREE.Mesh(geo6by2, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            } else {
+              var brick = new THREE.Mesh(geo8by2, material);
+              brick.position.set(selPos.x, selPos.y + 1, selPos.z);
+              scene.add(brick);
+            }
+          }
         } 
-        if (downKey) {
-          var brick = new THREE.Mesh(geometry, material);
-          brick.position.set(selPos.x, selPos.y - 1, selPos.z);
-          scene.add(brick);
+        if (downKey  && SELECTED.name !== 'rollover') {
+          // Multiple combinations
+          // TODO: can add in middle too?
+          if (depth === 1) { // in x direction or is 2 by 2
+            if (currAdd === 'Two By Two') {
+              var brick = new THREE.Mesh(geometry, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Two By Four') {
+              var brick = new THREE.Mesh(geo2by4, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Two By Six') {
+              var brick = new THREE.Mesh(geo2by6, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Two By Eight') {
+              var brick = new THREE.Mesh(geo2by8, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Four By Two') {
+              var brick = new THREE.Mesh(geo4by2, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Six By Two') {
+              var brick = new THREE.Mesh(geo6by2, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            } else {
+              var brick = new THREE.Mesh(geo8by2, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            }
+          } else { // in z direction
+            if (currAdd === 'Two By Two') {
+              var brick = new THREE.Mesh(geometry, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Two By Four') {
+              var brick = new THREE.Mesh(geo2by4, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Two By Six') {
+              var brick = new THREE.Mesh(geo2by6, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Two By Eight') {
+              var brick = new THREE.Mesh(geo2by8, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Four By Two') {
+              var brick = new THREE.Mesh(geo4by2, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            } else if (currAdd === 'Six By Two') {
+              var brick = new THREE.Mesh(geo6by2, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            } else {
+              var brick = new THREE.Mesh(geo8by2, material);
+              brick.position.set(selPos.x, selPos.y - 1, selPos.z);
+              scene.add(brick);
+            }
+          }
         }
 
         // TODO: Decide the position depending on the type of block clicked
       }
     }
     if (intersects[0].object.name === 'rollover' && upKey) {
+      console.log('intersecting');
       addABrick();
     }
   } else {
     if (mode === 'Build' && upKey) {
+      console.log('blank');
+
       addABrick();
     }
   }

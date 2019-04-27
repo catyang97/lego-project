@@ -136,14 +136,14 @@ brickFolder.add(types, 'BrickType', ['Two By Two', 'Two By Four', 'Two By Six', 
 });
 brickFolder.addColor(types, 'Color');
 
-// var material = new THREE.MeshLambertMaterial({color:vocab.Color});
+// var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
 // var brick = new THREE.Mesh(geo2by8, material);
 // brick.rotation.x = Math.PI / 2;
 // brick.position.set(20, 0, 0);
 // scene.add(brick);
 
 // For brick selection
-var material = new THREE.MeshLambertMaterial({color:vocab.Color});
+var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
 
 var rollOverMesh, rollOverMesh24, rollOverMesh26, rollOverMesh28;
 var rollOverMesh42, rollOverMesh62, rollOverMesh82, rollOverMaterial;
@@ -175,7 +175,7 @@ ambientLight.castShadow = true;
 scene.add(ambientLight);
 
 var directionalLight = new THREE.DirectionalLight(0xffffff);
-directionalLight.position.set(20, 25, -15);
+directionalLight.position.set(0, 10, 15);
 directionalLight.castShadow = true;
 scene.add(directionalLight);
 
@@ -369,7 +369,7 @@ function setUpBricks() {
                 curr-=curr2by8*4;
                 // Draw
                 for (var draw = 0; draw < curr2by8; draw++) {
-                  var material = new THREE.MeshLambertMaterial({color:vocab.Color});
+                  var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
                   var brick = new THREE.Mesh(geo2by8, material);
                   brick.position.set(j, i, k-2.5-(draw*4)-curr);
                   scene.add(brick);
@@ -393,7 +393,7 @@ function setUpBricks() {
                 curr-=curr2by6*3;
                 // Draw
                 for (var draw = 0; draw < curr2by6; draw++) {
-                  var material = new THREE.MeshLambertMaterial({color:vocab.Color});
+                  var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
                   var brick = new THREE.Mesh(geo2by6, material);
                   brick.position.set(j, i, k-2-(draw*3)-curr);
                   scene.add(brick);
@@ -418,7 +418,7 @@ function setUpBricks() {
                 curr-=curr2by4*2;
                 // Draw
                 for (var draw = 0; draw < curr2by4; draw++) {
-                  var material = new THREE.MeshLambertMaterial({color:vocab.Color});
+                  var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
                   var brick = new THREE.Mesh(geo2by4, material);
                   brick.position.set(j, i, k-1.5-(draw*2)-curr);
                   scene.add(brick);
@@ -428,7 +428,7 @@ function setUpBricks() {
 
             if (curr > 0) { // Fill remaining spots with single bricks
               for (var draw = 0; draw < curr; draw++) {
-                var material = new THREE.MeshLambertMaterial({color:vocab.Color});
+                var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
                 var brick = new THREE.Mesh(geometry, material);
                 brick.position.set(j, i, k-1-draw);
                 scene.add(brick);
@@ -467,7 +467,7 @@ function setUpBricks() {
                 curr-=curr2by8*4;
                 // Draw
                 for (var draw = 0; draw < curr2by8; draw++) {
-                  var material = new THREE.MeshLambertMaterial({color:vocab.Color});
+                  var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
                   var brick = new THREE.Mesh(geo8by2, material);
                   brick.position.set(j-2.5-(draw*4)-curr, i, k);
                   scene.add(brick);
@@ -491,7 +491,7 @@ function setUpBricks() {
                 curr-=curr2by6*3;
                 // Draw
                 for (var draw = 0; draw < curr2by6; draw++) {
-                  var material = new THREE.MeshLambertMaterial({color:vocab.Color});
+                  var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
                   var brick = new THREE.Mesh(geo6by2, material);
                   brick.position.set(j-2-(draw*3)-curr, i, k);
                   scene.add(brick);
@@ -516,7 +516,7 @@ function setUpBricks() {
                 curr-=curr2by4*2;
                 // Draw
                 for (var draw = 0; draw < curr2by4; draw++) {
-                  var material = new THREE.MeshLambertMaterial({color:vocab.Color});
+                  var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
                   var brick = new THREE.Mesh(geo4by2, material);
                   brick.position.set(j-1.5-(draw*2)-curr, i, k);
                   scene.add(brick);
@@ -526,7 +526,7 @@ function setUpBricks() {
 
             if (curr > 0) { // Fill remaining spots with single bricks
               for (var draw = 0; draw < curr; draw++) {
-                var material = new THREE.MeshLambertMaterial({color:vocab.Color});
+                var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
                 var brick = new THREE.Mesh(geometry, material);
                 brick.position.set(j-1-draw, i, k);
                 scene.add(brick);
@@ -663,7 +663,7 @@ function onDocumentMouseDown(event) {
 
         // raycasterCheck.setFromCamera(mouse, camera);
         // var intersectsCheck = raycasterCheck.intersectObjects(scene.children);
-        var material = new THREE.MeshLambertMaterial({color:types.Color});
+        var material = new THREE.MeshStandardMaterial({color:types.Color, metalness: 0.4, roughness: 0.5});
 
         if (upKey && SELECTED.name !== 'rollover') {
           // Multiple combinations
@@ -836,7 +836,7 @@ function onKeyUp(event) {
 }
 
 function addABrick() {
-  var material = new THREE.MeshLambertMaterial({color:types.Color});
+  var material = new THREE.MeshStandardMaterial({color:types.Color, metalness: 0.4, roughness: 0.5});
   if (currAdd === 'Two By Two') {
     var brick = new THREE.Mesh(geometry, material);
     brick.position.set(rollOverMesh.position.x, rollOverMesh.position.y, rollOverMesh.position.z);

@@ -196,20 +196,19 @@ loader.load(
   'https://raw.githubusercontent.com/catyang97/lego-project/master/src/twobytwolego.obj',
   // Called when resource is loaded
   function (object) {
-      object.traverse(function(child) {
-          if (child instanceof THREE.Mesh) {
-              geometry = child.geometry;
-              geometry.addAttribute('depth', 1);
-          }
-      });
+    object.traverse(function(child) {
+        if (child instanceof THREE.Mesh) {
+            geometry = child.geometry;
+        }
+    });
   },
   // called when loading is in progresses
   function (xhr) {
-      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
   },
   // called when loading has errors
   function (error) {
-      console.log('An error happened');
+    console.log('An error happened');
   }
 );
 
@@ -221,7 +220,6 @@ loader.load(
       object.traverse(function(child) {
           if (child instanceof THREE.Mesh) {
               geo2by4 = child.geometry;
-              geo2by4.addAttribute('depth', 2);
           }
       });
   },
@@ -243,7 +241,6 @@ loader.load(
       object.traverse(function(child) {
           if (child instanceof THREE.Mesh) {
               geo2by6 = child.geometry;
-              geo2by6.addAttribute('depth', 3);
           }
       });
   },
@@ -265,7 +262,6 @@ loader.load(
       object.traverse(function(child) {
           if (child instanceof THREE.Mesh) {
               geo2by8 = child.geometry;
-              geo2by8.addAttribute('depth', 4);
           }
       });
   },
@@ -287,7 +283,6 @@ loader.load(
       object.traverse(function(child) {
           if (child instanceof THREE.Mesh) {
               geo4by2 = child.geometry;
-              geo4by2.addAttribute('depth', 1);
           }
       });
   },
@@ -309,7 +304,6 @@ loader.load(
       object.traverse(function(child) {
           if (child instanceof THREE.Mesh) {
               geo6by2 = child.geometry;
-              geo6by2.addAttribute('depth', 1);
           }
       });
   },
@@ -331,7 +325,6 @@ loader.load(
       object.traverse(function(child) {
           if (child instanceof THREE.Mesh) {
               geo8by2 = child.geometry;
-              geo8by2.addAttribute('depth', 1);
           }
       });
   },
@@ -787,6 +780,21 @@ function onDocumentMouseMove(event) {
 }
 
 function onDocumentMouseDown(event) {
+  geometry.addAttribute('depth', new THREE.Float32BufferAttribute([1], 1));
+  geometryR.addAttribute('depth', new THREE.Float32BufferAttribute([1], 1));
+  geo2by4.addAttribute('depth', new THREE.Float32BufferAttribute([2], 1));
+  geo2by4R.addAttribute('depth', new THREE.Float32BufferAttribute([2], 1));
+  geo2by6.addAttribute('depth', new THREE.Float32BufferAttribute([3], 1));
+  geo2by6R.addAttribute('depth', new THREE.Float32BufferAttribute([3], 1));
+  geo2by8.addAttribute('depth', new THREE.Float32BufferAttribute([4], 1));
+  geo2by8R.addAttribute('depth', new THREE.Float32BufferAttribute([4], 1));
+  geo4by2.addAttribute('depth', new THREE.Float32BufferAttribute([1], 1));
+  geo4by2R.addAttribute('depth', new THREE.Float32BufferAttribute([1], 1));
+  geo6by2.addAttribute('depth', new THREE.Float32BufferAttribute([1], 1));
+  geo6by2R.addAttribute('depth', new THREE.Float32BufferAttribute([1], 1));
+  geo8by2.addAttribute('depth', new THREE.Float32BufferAttribute([1], 1));
+  geo8by2R.addAttribute('depth', new THREE.Float32BufferAttribute([1], 1));
+
   // event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
@@ -804,14 +812,9 @@ function onDocumentMouseDown(event) {
           scene.remove(SELECTED);
         }
       } else if (mode === 'Build') {
-        // console.log(SELECTED.geometry.attributes.depth.array);
         var selPos = SELECTED.position;
-        var depth = SELECTED.geometry.parameters.depth; // z
-        // var width = SELECTED.geometry.parameters.width; // x
-        // Choose to put a block below or above?
+        var depth = SELECTED.geometry.attributes.depth.array[0]; // z
 
-        // raycasterCheck.setFromCamera(mouse, camera);
-        // var intersectsCheck = raycasterCheck.intersectObjects(scene.children);
         var material = new THREE.MeshStandardMaterial({color:types.Color, metalness: 0.4, roughness: 0.5});
 
         if (upKey && SELECTED.name !== 'rollover') {

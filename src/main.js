@@ -50,6 +50,8 @@ var geo4by2 = new THREE.BoxBufferGeometry(2, 1, 1);
 var geo6by2 = new THREE.BoxBufferGeometry(3, 1, 1);
 var geo8by2 = new THREE.BoxBufferGeometry(4, 1, 1);
 
+var geoCyl = new THREE.CylinderBufferGeometry(0.125, 0.125, 0.25, 32);
+
 // Modes
 var mode;
 var currAdd = 'Two By Two', prevAdd = 'Two By Two'; // What type of brick we are adding right now
@@ -142,6 +144,13 @@ brickFolder.addColor(types, 'Color');
 // brick.position.set(20, 0, 0);
 // scene.add(brick);
 
+var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
+
+// var cyl = new THREE.Mesh(geoCyl, material);
+// cyl.position.set(0,0,0);
+// scene.add(cyl);
+
+
 // For brick selection
 var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
 
@@ -189,6 +198,8 @@ window.addEventListener('keydown', onKeyDown, false);
 window.addEventListener('keyup', onKeyUp, false);
 window.addEventListener('resize', onWindowResize, false);
 animate();
+
+
 
 // Load a resource- from three.js docs
 loader.load(

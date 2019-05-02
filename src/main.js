@@ -204,9 +204,10 @@ animate();
 // Load a resource- from three.js docs
 loader.load(
 	// Resource URL
-  'https://raw.githubusercontent.com/catyang97/lego-project/master/src/baymax.obj',
+  // 'https://raw.githubusercontent.com/catyang97/lego-project/master/src/baymax.obj',
   // 'https://raw.githubusercontent.com/catyang97/lego-project/master/src/mario.obj',
-	// Called when resource is loaded
+  'https://raw.githubusercontent.com/catyang97/lego-project/master/src/fourbytwolego.obj',
+  // Called when resource is loaded
 	function (object) {
     var box = new THREE.Box3().setFromObject(object);
     objMin = box.min,
@@ -215,7 +216,7 @@ loader.load(
     // Add all vertices of the obj to objVertices
     object.traverse(function(child) {
       if (child instanceof THREE.Mesh) {
-        // scene.add(child);
+        scene.add(child);
 
         // Start from bottom to top- y values
         startX = Math.floor(objMin.x);

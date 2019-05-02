@@ -43,10 +43,6 @@ raycasterCheck = new THREE.Raycaster();
 var mode;
 var currAdd = 'Two By Two', prevAdd = 'Two By Two'; // What type of brick we are adding right now
 
-// loadScene();
-// animate();
-
-// function loadScene() {
 // Set up sections of window- renderer and stats
 container = document.getElementById('container');
 container.innerHTML = "";
@@ -173,13 +169,9 @@ ambientLight.castShadow = true;
 scene.add(ambientLight);
 
 var directionalLight = new THREE.DirectionalLight(0xffffff);
-directionalLight.position.set(0, 10, 15);
+directionalLight.position.set(0, 5, 15);
 directionalLight.castShadow = true;
 scene.add(directionalLight);
-
-
-// loadObj();
-// console.log(positionOffsets);
 
 document.addEventListener('mousedown', onDocumentMouseDown, false);
 document.addEventListener('mousemove', onDocumentMouseMove, false);
@@ -464,11 +456,6 @@ loader.load(
 		console.log('An error happened');
 	}
 );
-
-// loader.onLoadComplete = function () {
-//   // console.log(positionOffsets[0]);
-// console.log('hi');
-// }
 
 function setUpBricks() {
   // console.log(mapLayers);

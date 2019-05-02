@@ -120,12 +120,6 @@ brickFolder.add(types, 'BrickType', ['Two By Two', 'Two By Four', 'Two By Six', 
 });
 brickFolder.addColor(types, 'Color');
 
-// var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
-// var brick = new THREE.Mesh(geo2by8, material);
-// brick.rotation.x = Math.PI / 2;
-// brick.position.set(20, 0, 0);
-// scene.add(brick);
-
 // For brick selection
 // Different brick shapes for rollovers
 var geometryR = new THREE.BoxBufferGeometry(1, 1, 1);
@@ -353,9 +347,6 @@ loader.load(
         endY = Math.ceil(objMax.y);
         startZ = Math.floor(objMin.z);
         endZ = Math.ceil(objMax.z);
-        // positionOffsets[0] = startX;
-        // positionOffsets[1] = startY;
-        // positionOffsets[2] = startZ;
         var xSize = endX - startX;
         var rem = ((objMax.x-objMin.x)/2.0)%1;
         rem = 0;
@@ -1015,4 +1006,8 @@ function deleteRollovers() {
   scene.remove(rollOverMesh42);
   scene.remove(rollOverMesh62);
   scene.remove(rollOverMesh82);
+}
+
+function separateLayers() {
+   
 }

@@ -3,7 +3,6 @@ var OrbitControls = require('./OrbitControls.js');
 var Stats = require('./stats.min.js');
 var dat = require('./dat.gui.min.js');
 var OBJLoader = require('./OBJLoader.js');
-// import Brick from './Brick.js';
 
 // if (WEBGL.isWebGLAvailable() === false) {
 //   document.body.appendChild(WEBGL.getWebGLErrorMessage());
@@ -40,19 +39,6 @@ raycaster = new THREE.Raycaster();
 raycasterSelect = new THREE.Raycaster();
 raycasterCheck = new THREE.Raycaster();
 
-// Different brick shapes
-var geometry = new THREE.BoxBufferGeometry(1, 1, 1);
-var geo2by3 = new THREE.BoxBufferGeometry(1, 1, 1.5);
-var geo2by4 = new THREE.BoxBufferGeometry(1, 1, 2);
-var geo2by6 = new THREE.BoxBufferGeometry(1, 1, 3);
-var geo2by8 = new THREE.BoxBufferGeometry(1, 1, 4);
-var geo3by2 = new THREE.BoxBufferGeometry(1.5, 1, 1);
-var geo4by2 = new THREE.BoxBufferGeometry(2, 1, 1);
-var geo6by2 = new THREE.BoxBufferGeometry(3, 1, 1);
-var geo8by2 = new THREE.BoxBufferGeometry(4, 1, 1);
-
-var geoCyl = new THREE.CylinderBufferGeometry(0.125, 0.125, 0.25, 32);
-
 // Modes
 var mode;
 var currAdd = 'Two By Two', prevAdd = 'Two By Two'; // What type of brick we are adding right now
@@ -80,7 +66,6 @@ controls.enablePan = true;
 controls.enableZoom = true;
 controls.keyPanSpeed = 15.0;
 scene.background = new THREE.Color(0xc5ecf9);
-// scene.add(new THREE.AxesHelper(20));
 
 gui = new dat.gui.GUI();
 var vocab = {
@@ -145,40 +130,41 @@ brickFolder.addColor(types, 'Color');
 // brick.position.set(20, 0, 0);
 // scene.add(brick);
 
-// var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
-
-// var cyl = new THREE.Mesh(geoCyl, material);
-// cyl.position.set(0,0,0);
-// scene.add(cyl);
-// var test = new Brick();
-// console.log(test);
-// scene.add(test);
-
 // For brick selection
+// Different brick shapes for rollovers
+var geometryR = new THREE.BoxBufferGeometry(1, 1, 1);
+var geo2by3R = new THREE.BoxBufferGeometry(1, 1, 1.5);
+var geo2by4R = new THREE.BoxBufferGeometry(1, 1, 2);
+var geo2by6R = new THREE.BoxBufferGeometry(1, 1, 3);
+var geo2by8R = new THREE.BoxBufferGeometry(1, 1, 4);
+var geo3by2R = new THREE.BoxBufferGeometry(1.5, 1, 1);
+var geo4by2R = new THREE.BoxBufferGeometry(2, 1, 1);
+var geo6by2R = new THREE.BoxBufferGeometry(3, 1, 1);
+var geo8by2R = new THREE.BoxBufferGeometry(4, 1, 1);
 var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
 
 var rollOverMesh, rollOverMesh24, rollOverMesh26, rollOverMesh28;
 var rollOverMesh42, rollOverMesh62, rollOverMesh82, rollOverMaterial;
 rollOverMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, opacity: 0.5, transparent: true});
-rollOverMesh = new THREE.Mesh(geometry, rollOverMaterial);
+rollOverMesh = new THREE.Mesh(geometryR, rollOverMaterial);
 rollOverMesh.name = 'rollover';
 
-rollOverMesh24 = new THREE.Mesh(geo2by4, rollOverMaterial);
+rollOverMesh24 = new THREE.Mesh(geo2by4R, rollOverMaterial);
 rollOverMesh24.name = 'rollover';
 
-rollOverMesh26 = new THREE.Mesh(geo2by6, rollOverMaterial);
+rollOverMesh26 = new THREE.Mesh(geo2by6R, rollOverMaterial);
 rollOverMesh26.name = 'rollover';
 
-rollOverMesh28 = new THREE.Mesh(geo2by8, rollOverMaterial);
+rollOverMesh28 = new THREE.Mesh(geo2by8R, rollOverMaterial);
 rollOverMesh28.name = 'rollover';
 
-rollOverMesh42 = new THREE.Mesh(geo4by2, rollOverMaterial);
+rollOverMesh42 = new THREE.Mesh(geo4by2R, rollOverMaterial);
 rollOverMesh42.name = 'rollover';
 
-rollOverMesh62 = new THREE.Mesh(geo6by2, rollOverMaterial);
+rollOverMesh62 = new THREE.Mesh(geo6by2R, rollOverMaterial);
 rollOverMesh62.name = 'rollover';
 
-rollOverMesh82 = new THREE.Mesh(geo8by2, rollOverMaterial);
+rollOverMesh82 = new THREE.Mesh(geo8by2R, rollOverMaterial);
 rollOverMesh82.name = 'rollover';
 
 // Lights!
@@ -202,28 +188,150 @@ window.addEventListener('keyup', onKeyUp, false);
 window.addEventListener('resize', onWindowResize, false);
 animate();
 
-// function loadModel() {
+var geometry, geo2by4, geo2by6, geo2by8, geo4by2, geo6by2, geo8by2;
 
+// Load every Lego obj
+loader.load(
+  // Resource URL
+  'https://raw.githubusercontent.com/catyang97/lego-project/master/src/twobytwolego.obj',
+  // Called when resource is loaded
+  function (object) {
+      object.traverse(function(child) {
+          if (child instanceof THREE.Mesh) {
+              geometry = child.geometry;
+              geometry.addAttribute('depth', 1);
+          }
+      });
+  },
+  // called when loading is in progresses
+  function (xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+  },
+  // called when loading has errors
+  function (error) {
+      console.log('An error happened');
+  }
+);
 
-// }
+loader.load(
+  // Resource URL
+  'https://raw.githubusercontent.com/catyang97/lego-project/master/src/twobyfourlego.obj',
+  // Called when resource is loaded
+  function (object) {
+      object.traverse(function(child) {
+          if (child instanceof THREE.Mesh) {
+              geo2by4 = child.geometry;
+              geo2by4.addAttribute('depth', 2);
+          }
+      });
+  },
+  // called when loading is in progresses
+  function (xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+  },
+  // called when loading has errors
+  function (error) {
+      console.log('An error happened');
+  }
+);
 
-// var manager = new THREE.LoadingManager(loadModel);
-var geoTest;
+loader.load(
+  // Resource URL
+  'https://raw.githubusercontent.com/catyang97/lego-project/master/src/twobysixlego.obj',
+  // Called when resource is loaded
+  function (object) {
+      object.traverse(function(child) {
+          if (child instanceof THREE.Mesh) {
+              geo2by6 = child.geometry;
+              geo2by6.addAttribute('depth', 3);
+          }
+      });
+  },
+  // called when loading is in progresses
+  function (xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+  },
+  // called when loading has errors
+  function (error) {
+      console.log('An error happened');
+  }
+);
+
+loader.load(
+  // Resource URL
+  'https://raw.githubusercontent.com/catyang97/lego-project/master/src/twobyeightlego.obj',
+  // Called when resource is loaded
+  function (object) {
+      object.traverse(function(child) {
+          if (child instanceof THREE.Mesh) {
+              geo2by8 = child.geometry;
+              geo2by8.addAttribute('depth', 4);
+          }
+      });
+  },
+  // called when loading is in progresses
+  function (xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+  },
+  // called when loading has errors
+  function (error) {
+      console.log('An error happened');
+  }
+);
+
 loader.load(
   // Resource URL
   'https://raw.githubusercontent.com/catyang97/lego-project/master/src/fourbytwolego.obj',
   // Called when resource is loaded
   function (object) {
-      // Add all vertices of the obj to objVertices
       object.traverse(function(child) {
           if (child instanceof THREE.Mesh) {
-              // scene.add(child);
-              geoTest = child.geometry;
-              geoTest.addAttribute('depth', 2);
-              // console.log(geoTest);
-              // geoTest.material = material;
-              // geo = child;
-              // build(geo, material);
+              geo4by2 = child.geometry;
+              geo4by2.addAttribute('depth', 1);
+          }
+      });
+  },
+  // called when loading is in progresses
+  function (xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+  },
+  // called when loading has errors
+  function (error) {
+      console.log('An error happened');
+  }
+);
+
+loader.load(
+  // Resource URL
+  'https://raw.githubusercontent.com/catyang97/lego-project/master/src/sixbytwolego.obj',
+  // Called when resource is loaded
+  function (object) {
+      object.traverse(function(child) {
+          if (child instanceof THREE.Mesh) {
+              geo6by2 = child.geometry;
+              geo6by2.addAttribute('depth', 1);
+          }
+      });
+  },
+  // called when loading is in progresses
+  function (xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+  },
+  // called when loading has errors
+  function (error) {
+      console.log('An error happened');
+  }
+);
+
+loader.load(
+  // Resource URL
+  'https://raw.githubusercontent.com/catyang97/lego-project/master/src/eightbytwolego.obj',
+  // Called when resource is loaded
+  function (object) {
+      object.traverse(function(child) {
+          if (child instanceof THREE.Mesh) {
+              geo8by2 = child.geometry;
+              geo8by2.addAttribute('depth', 1);
           }
       });
   },
@@ -469,9 +577,7 @@ function setUpBricks() {
             if (curr > 0) { // Fill remaining spots with single bricks
               for (var draw = 0; draw < curr; draw++) {
                 var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
-                // var brick = new THREE.Mesh(geometry, material);
-                var brick = new THREE.Mesh(geoTest, material);
-
+                var brick = new THREE.Mesh(geometry, material);
                 brick.position.set(j, i, k-1-draw);
                 scene.add(brick);
               }            
@@ -701,7 +807,7 @@ function onDocumentMouseDown(event) {
         // console.log(SELECTED.geometry.attributes.depth.array);
         var selPos = SELECTED.position;
         var depth = SELECTED.geometry.parameters.depth; // z
-        var width = SELECTED.geometry.parameters.width; // x
+        // var width = SELECTED.geometry.parameters.width; // x
         // Choose to put a block below or above?
 
         // raycasterCheck.setFromCamera(mouse, camera);
@@ -714,8 +820,6 @@ function onDocumentMouseDown(event) {
           if (depth === 1) { // in x direction or is 2 by 2
             if (currAdd === 'Two By Two') {
               var brick = new THREE.Mesh(geometry, material);
-              // var brick = new THREE.Mesh(geoTest, material);
-
               brick.position.set(selPos.x, selPos.y + 1, selPos.z);
               scene.add(brick);
             } else if (currAdd === 'Two By Four') {
@@ -883,9 +987,7 @@ function onKeyUp(event) {
 function addABrick() {
   var material = new THREE.MeshStandardMaterial({color:types.Color, metalness: 0.4, roughness: 0.5});
   if (currAdd === 'Two By Two') {
-    // var brick = new THREE.Mesh(geometry, material);
-    var brick = new THREE.Mesh(geoTest, material);
-
+    var brick = new THREE.Mesh(geometry, material);
     brick.position.set(rollOverMesh.position.x, rollOverMesh.position.y, rollOverMesh.position.z);
     scene.add(brick);
   } else if (currAdd === 'Two By Four') {

@@ -86,7 +86,7 @@
 	// var objVertices = [];
 	var objMin, objMax, objSize;
 	var startX, endX, startY, endY, startZ, endZ;
-	var num2by2, num2by3, num2by4, num2by6, num2by8;
+	var num2by4, num2by6, num2by8;
 	
 	raycaster = new THREE.Raycaster();
 	raycasterSelect = new THREE.Raycaster();
@@ -108,7 +108,7 @@
 	container.appendChild(renderer.domElement);
 	
 	// Set up camera, scene
-	camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 20000);
+	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 20000);
 	camera.position.set(30, 20, 30);
 	controls = new THREE.OrbitControls(camera, renderer.domElement); // Move through scene with mouse and arrow keys
 	controls.update();
@@ -119,8 +119,6 @@
 	
 	gui = new dat.gui.GUI();
 	var vocab = {
-	  // TwoByTwo: 200,
-	  // TwoByThree: '200',
 	  TwoByFour: '200',
 	  TwoBySix: '200',
 	  TwoByEight: '200',
@@ -128,8 +126,6 @@
 	  Mode: 'Navigate'
 	};
 	
-	// num2by2 = Number(vocab.TwoByTwo);
-	// num2by3 = Number(vocab.TwoByThree);
 	num2by4 = Number(vocab.TwoByFour);
 	num2by6 = Number(vocab.TwoBySix);
 	num2by8 = Number(vocab.TwoByEight);
@@ -152,6 +148,13 @@
 	    setUpBricks();
 	  } };
 	gui.add(startButton, 'BUILD');
+	
+	// var manualButton = {MANUAL:function() { 
+	//   console.log("clicked") ;
+	//   runProgram = true;
+	//   separateLayers();
+	// }};
+	// gui.add(manualButton,'MANUAL');
 	
 	gui.add(vocab, 'Mode', ['Navigate', 'Build', 'Delete']).onChange(function (value) {
 	  mode = vocab.Mode;
@@ -176,11 +179,9 @@
 	// For brick selection
 	// Different brick shapes for rollovers
 	var geometryR = new THREE.BoxBufferGeometry(1, 1, 1);
-	var geo2by3R = new THREE.BoxBufferGeometry(1, 1, 1.5);
 	var geo2by4R = new THREE.BoxBufferGeometry(1, 1, 2);
 	var geo2by6R = new THREE.BoxBufferGeometry(1, 1, 3);
 	var geo2by8R = new THREE.BoxBufferGeometry(1, 1, 4);
-	var geo3by2R = new THREE.BoxBufferGeometry(1.5, 1, 1);
 	var geo4by2R = new THREE.BoxBufferGeometry(2, 1, 1);
 	var geo6by2R = new THREE.BoxBufferGeometry(3, 1, 1);
 	var geo8by2R = new THREE.BoxBufferGeometry(4, 1, 1);
@@ -386,14 +387,14 @@
 	
 	      // Start from bottom to top- y values
 	      startX = Math.floor(objMin.x);
-	      endX = Math.ceil(objMax.x);
+	      endX = Math.ceil(objMax.x) + 1;
 	      startY = Math.floor(objMin.y);
-	      endY = Math.ceil(objMax.y);
+	      endY = Math.ceil(objMax.y) + 1;
 	      startZ = Math.floor(objMin.z);
-	      endZ = Math.ceil(objMax.z);
+	      endZ = Math.ceil(objMax.z) + 1;
+	      var zSize = endZ - startZ;
+	
 	      var xSize = endX - startX;
-	      var rem = (objMax.x - objMin.x) / 2.0 % 1;
-	      rem = 0;
 	      for (var i = startY; i < endY; i++) {
 	        // Create 2D array
 	        var xArray = new Array(xSize);
@@ -409,13 +410,12 @@
 	        }
 	
 	        for (var j = startX; j < endX; j++) {
-	          var zSize = endZ - startZ;
 	          var zArray = new Array(zSize);
 	
 	          var start, end;
 	          var yes = false;
 	          // Shoot ray from front
-	          raycaster.set(new THREE.Vector3(j + rem, i + 0.5, endZ + 5), new THREE.Vector3(0, 0, -1));
+	          raycaster.set(new THREE.Vector3(j, i + 0.5, endZ + 5), new THREE.Vector3(0, 0, -1));
 	          var intersects = raycaster.intersectObject(child);
 	
 	          if (intersects.length === 0) {
@@ -428,7 +428,7 @@
 	          }
 	
 	          // Shoot ray from back
-	          raycaster.set(new THREE.Vector3(j + rem, i + 0.5, startZ - 5), new THREE.Vector3(0, 0, 1));
+	          raycaster.set(new THREE.Vector3(j, i + 0.5, startZ - 5), new THREE.Vector3(0, 0, 1));
 	          var intersects = raycaster.intersectObject(child);
 	
 	          if (intersects.length === 0) {
@@ -465,7 +465,11 @@
 	
 	        // if (i % 2 == 0) {
 	        mapLayers.set(i, xArray);
+	
+	        console.log(i);
+	        console.log(xArray);
 	        // } else {
+	        console.log(oddZArray);
 	        mapLayersOdd.set(i, oddZArray);
 	        // }
 	      }
@@ -491,14 +495,9 @@
 	});
 	
 	function setUpBricks() {
-	  // console.log(mapLayers);
-	  // console.log(mapLayersOdd);
-	  // loadScene();
-	  // animate();
-	  console.log(num2by8);
-	  console.log(num2by6);
-	  console.log(num2by4);
 	
+	  console.log(mapLayers);
+	  console.log(mapLayersOdd);
 	  for (var i = startY; i < endY; i++) {
 	    var xzArray = mapLayers.get(i);
 	    var zxArray = mapLayersOdd.get(i);
@@ -719,17 +718,15 @@
 	          }
 	        }
 	        zxArray[j] = xArray; // Update 2D array for this level
+	        // if (i === 11) {console.log(zxArray);}
 	      }
 	    }
 	    mapLayers.set(i, xzArray); // Update the map with updated arrays
-	    mapLayers.set(i, zxArray);
+	    mapLayersOdd.set(i, zxArray);
 	  }
-	  // var geometry1 = new THREE.PlaneGeometry( 100, 100, 100 );
-	  // var material1 = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
-	  // var plane = new THREE.Mesh( geometry1, material1 );
-	  // plane.position.set(0, startY, 0);
-	  // plane.rotateX( - Math.PI / 2);
-	  // scene.add( plane );
+	
+	  console.log(mapLayers);
+	  console.log(mapLayersOdd);
 	}
 	
 	function onWindowResize() {
@@ -1074,7 +1071,88 @@
 	  scene.remove(rollOverMesh82);
 	}
 	
-	function separateLayers() {}
+	// TODO: Construction Manual
+	// function separateLayers() {
+	//   var offset = 0 - startY;
+	
+	//   for (var i = startY; i < endY; i++) {
+	//     var xzArray = mapLayers.get(i);
+	//     var zxArray = mapLayersOdd.get(i);
+	//     // console.log(xzArray);
+	//     // console.log(i);
+	//     if (i % 2 == 0) { // even - x then z
+	//       for (var j = startX; j < endX; j++) {
+	//         // Getting the 2D array
+	//         console.log(j);
+	//         var zArray = xzArray[j];
+	
+	//         for (var k = startZ; k < endZ + 1; k++) {
+	//           // console.log(zArray[k]);
+	//           if (zArray[k] === 2) {
+	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
+	//             var brick = new THREE.Mesh(geometry, material);
+	//             brick.position.set(j+20.0, (i+offset) * 3, k);
+	//             scene.add(brick);
+	//           } else if (zArray[k] === 4) {
+	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
+	//             var brick = new THREE.Mesh(geo2by4, material);
+	//             brick.position.set(j+20.0, (i+offset) * 3, k+0.5);
+	//             scene.add(brick);
+	//             k++;
+	//           } else if (zArray[k] === 6) {
+	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
+	//             var brick = new THREE.Mesh(geo2by6, material);
+	//             brick.position.set(j+20.0, (i+offset) * 3, k+1.0);
+	//             scene.add(brick);
+	//             k+=2;
+	//           } else if (zArray[k] === 8) {
+	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
+	//             var brick = new THREE.Mesh(geo2by8, material);
+	//             brick.position.set(j+20.0, (i+offset) * 3, k+1.5);
+	//             scene.add(brick);
+	//             k+=3;
+	//           }
+	//         }
+	//       }
+	//     } else { // odd - z then x
+	//       for (var k = startZ; k < endZ; k++) {
+	//         // Getting the 2D array
+	//         var xArray = zxArray[k];
+	//         // console.log(zxArray);
+	//         // console.log(k);
+	//         // console.log(xArray);
+	//         for (var j = startX; j < endX + 1; j++) {
+	//           if (xArray[j] === 2) {
+	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
+	//             var brick = new THREE.Mesh(geometry, material);
+	//             brick.position.set(j+20.0, (i+offset) * 3, k);
+	//             scene.add(brick);
+	//           } else if (xArray[j] === 4) {
+	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
+	//             var brick = new THREE.Mesh(geo4by2, material);
+	//             brick.position.set(j+0.5+20.0, (i+offset) * 3, k);
+	//             scene.add(brick);
+	//             j++;
+	//           } else if (xArray[j] === 6) {
+	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
+	//             var brick = new THREE.Mesh(geo6by2, material);
+	//             brick.position.set(j+1.0+20.0, (i+offset) * 3, k);
+	//             scene.add(brick);
+	//             j+=2;
+	//           } else if (xArray[j] === 8) {
+	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
+	//             var brick = new THREE.Mesh(geo8by2, material);
+	//             brick.position.set(j+1.5+20.0, (i+offset) * 3, k);
+	//             scene.add(brick);
+	//             j+=3;
+	//           } else if (xArray[k] === 0) {
+	//             continue;
+	//           }
+	//         }
+	//       }
+	//     }
+	//   }
+	// }
 
 /***/ }),
 /* 1 */

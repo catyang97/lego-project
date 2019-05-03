@@ -4,11 +4,6 @@ var Stats = require('./stats.min.js');
 var dat = require('./dat.gui.min.js');
 var OBJLoader = require('./OBJLoader.js');
 
-// if (WEBGL.isWebGLAvailable() === false) {
-//   document.body.appendChild(WEBGL.getWebGLErrorMessage());
-//   document.getElementById('container').innerHTML = "";
-// }
-
 // Set Up
 var container, stats;
 var camera, controls, scene, renderer, raycaster, raycasterSelect, raycasterCheck;
@@ -23,14 +18,12 @@ var mapLayersOdd = new Map();
 var mapLayersBackup = new Map();
 var mapLayersOddBackup = new Map();
 
-// var positionOffsets = new Array(3);
 var gui;
 scene = new THREE.Scene();
 
 var runProgram = false;
 
 // Info from OBJ
-// var objVertices = [];
 var objMin, objMax, objSize;
 var startX, endX, startY, endY, startZ, endZ;
 var num2by4, num2by6, num2by8;
@@ -77,7 +70,6 @@ num2by6 = Number(vocab.TwoBySix);
 num2by8 = Number(vocab.TwoByEight);
 mode = vocab.Mode;
 
-// TODO: add numbers and controls to gui
 gui.add(vocab, 'TwoByFour').onChange(function(newVal) {
   num2by4 = Number(vocab.TwoByFour);
 });
@@ -89,14 +81,12 @@ gui.add(vocab, 'TwoByEight').onChange(function(newVal) {
 });
 gui.addColor(vocab, 'Color');
 var startButton = {BUILD:function() { 
-  console.log("clicked") ;
   runProgram = true;
   setUpBricks();
 }};
 gui.add(startButton,'BUILD');
 
 var manualButton = {MANUAL:function() { 
-  console.log("clicked") ;
   runProgram = true;
   separateLayers();
 }};
@@ -359,9 +349,6 @@ loader.load(
           // Set up array for odd y values
           for (var k = startZ; k < endZ; k++) {          
             var oddXArray = new Array(xSize);
-            // for (var j = startX; j < endX; j++) {
-            //   oddXArray = 0;
-            // }
             oddZArray[k] = oddXArray;
           }
 
@@ -375,7 +362,6 @@ loader.load(
             var intersects = raycaster.intersectObject(child);
 
             if (intersects.length === 0) {
-              // empty??
               yes = false;
             } else {
               yes = true;
@@ -419,23 +405,11 @@ loader.load(
 
           // TODO: Pass number 2 
 
-
-          // if (i % 2 == 0) {
           mapLayers.set(i, xArray);
-          // } else {
           mapLayersOdd.set(i, oddZArray);
-          // }
         }
 
-        // Get all vertices
-        // var objPos = child.geometry.attributes.position;
-        // for (var i = 0; i < objPos.count; i++) {
-        //   var vector = new THREE.Vector3();
-        //   vector.fromBufferAttribute(objPos, i);
-        //   objVertices.push(vector);
-        // }
       }
-      // setUpBricks();
     });
 	},
 	// called when loading is in progresses
@@ -672,7 +646,6 @@ function render() {
 }
 
 function onDocumentMouseMove(event) {
-  // event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
@@ -758,7 +731,6 @@ function onDocumentMouseDown(event) {
   geo8by2.addAttribute('depth', new THREE.Float32BufferAttribute([1], 1));
   geo8by2R.addAttribute('depth', new THREE.Float32BufferAttribute([1], 1));
 
-  // event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
@@ -766,8 +738,6 @@ function onDocumentMouseDown(event) {
   raycasterSelect.setFromCamera(mouse, camera);
   var intersects = raycasterSelect.intersectObjects(scene.children);
   if (intersects.length > 0) {
-    // console.log('hi');
-    // console.log(intersects[0].object);
     if (SELECTED != intersects[0].object) {
       SELECTED = intersects[0].object;
       if (mode == 'Delete') {
@@ -782,7 +752,6 @@ function onDocumentMouseDown(event) {
 
         if (upKey && SELECTED.name !== 'rollover') {
           // Multiple combinations
-          // TODO: can add in middle too?
           if (depth === 1) { // in x direction or is 2 by 2
             if (currAdd === 'Two By Two') {
               var brick = new THREE.Mesh(geometry, material);
@@ -847,7 +816,6 @@ function onDocumentMouseDown(event) {
         } 
         if (downKey  && SELECTED.name !== 'rollover') {
           // Multiple combinations
-          // TODO: can add in middle too?
           if (depth === 1) { // in x direction or is 2 by 2
             if (currAdd === 'Two By Two') {
               var brick = new THREE.Mesh(geometry, material);
@@ -915,13 +883,10 @@ function onDocumentMouseDown(event) {
       }
     }
     if (intersects[0].object.name === 'rollover' && upKey) {
-      console.log('intersecting');
       addABrick();
     }
   } else {
     if (mode === 'Build' && upKey) {
-      console.log('blank');
-
       addABrick();
     }
   }
@@ -1000,15 +965,11 @@ function separateLayers() {
   for (var i = startY; i < endY; i++) {
     var xzArray = mapLayers.get(i);
     var zxArray = mapLayersOdd.get(i);
-    // console.log(xzArray);
-    // console.log(i);
     if (i % 2 == 0) { // even - x then z
       for (var j = startX; j < endX; j++) {
         // Getting the 2D array
         var zArray = xzArray[j];
-
         for (var k = startZ; k < endZ + 1; k++) {
-          // console.log(zArray[k]);
           if (zArray[k] === 2) {
             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
             var brick = new THREE.Mesh(geometry, material);
@@ -1039,9 +1000,6 @@ function separateLayers() {
       for (var k = startZ; k < endZ; k++) {
         // Getting the 2D array
         var xArray = zxArray[k];
-        // console.log(zxArray);
-        // console.log(k);
-        // console.log(xArray);
         for (var j = startX; j < endX + 1; j++) {
           if (xArray[j] === 2) {
             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});

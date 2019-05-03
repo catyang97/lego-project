@@ -149,12 +149,12 @@
 	  } };
 	gui.add(startButton, 'BUILD');
 	
-	// var manualButton = {MANUAL:function() { 
-	//   console.log("clicked") ;
-	//   runProgram = true;
-	//   separateLayers();
-	// }};
-	// gui.add(manualButton,'MANUAL');
+	var manualButton = { MANUAL: function MANUAL() {
+	    console.log("clicked");
+	    runProgram = true;
+	    separateLayers();
+	  } };
+	gui.add(manualButton, 'MANUAL');
 	
 	gui.add(vocab, 'Mode', ['Navigate', 'Build', 'Delete']).onChange(function (value) {
 	  mode = vocab.Mode;
@@ -373,7 +373,7 @@
 	
 	// Load a resource- from three.js docs
 	loader.load(
-	// Resource URL
+	// Resource URL: Change here
 	'https://raw.githubusercontent.com/catyang97/lego-project/master/src/baymax.obj',
 	// 'https://raw.githubusercontent.com/catyang97/lego-project/master/src/mario.obj',
 	// Called when resource is loaded
@@ -465,11 +465,7 @@
 	
 	        // if (i % 2 == 0) {
 	        mapLayers.set(i, xArray);
-	
-	        console.log(i);
-	        console.log(xArray);
 	        // } else {
-	        console.log(oddZArray);
 	        mapLayersOdd.set(i, oddZArray);
 	        // }
 	      }
@@ -495,9 +491,6 @@
 	});
 	
 	function setUpBricks() {
-	
-	  console.log(mapLayers);
-	  console.log(mapLayersOdd);
 	  for (var i = startY; i < endY; i++) {
 	    var xzArray = mapLayers.get(i);
 	    var zxArray = mapLayersOdd.get(i);
@@ -508,8 +501,7 @@
 	        // Getting the 2D array
 	        var zArray = xzArray[j];
 	        var curr = 0;
-	        var curr2by3,
-	            curr2by4,
+	        var curr2by4,
 	            curr2by6,
 	            curr2by8,
 	            curr2by2 = 0;
@@ -528,7 +520,7 @@
 	                }
 	                num2by8 -= curr2by8; // Subtract from total available
 	                // Renumber
-	                var startK = k - curr2by8 * 4 - curr;
+	                var startK = k - curr2by8 * 4;
 	                var endK = startK + curr2by8 * 4;
 	                for (var renum = startK; renum < endK; renum++) {
 	                  zArray[renum] = 8;
@@ -554,7 +546,7 @@
 	                }
 	                num2by6 -= curr2by6; // Subtract from total available
 	                // Renumber
-	                var startK = k - curr2by6 * 3 - curr;
+	                var startK = k - curr2by6 * 3;
 	                var endK = startK + curr2by6 * 3;
 	                for (var renum = startK; renum < endK; renum++) {
 	                  zArray[renum] = 6;
@@ -580,7 +572,7 @@
 	                }
 	                num2by4 -= curr2by4; // Subtract from total available
 	                // Renumber
-	                var startK = k - curr2by4 * 2 - curr;
+	                var startK = k - curr2by4 * 2;
 	                var endK = startK + curr2by4 * 2;
 	                for (var renum = startK; renum < endK; renum++) {
 	                  zArray[renum] = 4;
@@ -605,7 +597,7 @@
 	                scene.add(brick);
 	              }
 	            }
-	            curr2by3, curr2by4, curr2by6, curr2by8, curr2by2, curr = 0;
+	            curr2by4, curr2by6, curr2by8, curr2by2, curr = 0;
 	          }
 	        }
 	        xzArray[j] = zArray; // Update 2D array for this level
@@ -637,7 +629,7 @@
 	                }
 	                num2by8 -= curr2by8; // Subtract from total available
 	                // Renumber
-	                var startJ = j - curr2by8 * 4 - curr;
+	                var startJ = j - curr2by8 * 4;
 	                var endJ = startJ + curr2by8 * 4;
 	                for (var renum = startJ; renum < endJ; renum++) {
 	                  xArray[renum] = 8;
@@ -663,7 +655,7 @@
 	                }
 	                num2by6 -= curr2by6; // Subtract from total available
 	                // Renumber
-	                var startJ = j - curr2by6 * 3 - curr;
+	                var startJ = j - curr2by6 * 3;
 	                var endJ = startJ + curr2by6 * 3;
 	                for (var renum = startJ; renum < endJ; renum++) {
 	                  xArray[renum] = 6;
@@ -689,7 +681,7 @@
 	                }
 	                num2by4 -= curr2by4; // Subtract from total available
 	                // Renumber
-	                var startJ = j - curr2by4 * 2 - curr;
+	                var startJ = j - curr2by4 * 2;
 	                var endJ = startJ + curr2by4 * 2;
 	                for (var renum = startJ; renum < endJ; renum++) {
 	                  xArray[renum] = 4;
@@ -717,16 +709,12 @@
 	            curr2by3, curr2by4, curr2by6, curr2by8, curr2by2, curr = 0;
 	          }
 	        }
-	        zxArray[j] = xArray; // Update 2D array for this level
-	        // if (i === 11) {console.log(zxArray);}
+	        zxArray[k] = xArray; // Update 2D array for this level
 	      }
 	    }
 	    mapLayers.set(i, xzArray); // Update the map with updated arrays
 	    mapLayersOdd.set(i, zxArray);
 	  }
-	
-	  console.log(mapLayers);
-	  console.log(mapLayersOdd);
 	}
 	
 	function onWindowResize() {
@@ -1071,88 +1059,89 @@
 	  scene.remove(rollOverMesh82);
 	}
 	
-	// TODO: Construction Manual
-	// function separateLayers() {
-	//   var offset = 0 - startY;
+	// "Construction Manual"
+	function separateLayers() {
+	  var offset = 0 - startY;
 	
-	//   for (var i = startY; i < endY; i++) {
-	//     var xzArray = mapLayers.get(i);
-	//     var zxArray = mapLayersOdd.get(i);
-	//     // console.log(xzArray);
-	//     // console.log(i);
-	//     if (i % 2 == 0) { // even - x then z
-	//       for (var j = startX; j < endX; j++) {
-	//         // Getting the 2D array
-	//         console.log(j);
-	//         var zArray = xzArray[j];
+	  for (var i = startY; i < endY; i++) {
+	    var xzArray = mapLayers.get(i);
+	    var zxArray = mapLayersOdd.get(i);
+	    // console.log(xzArray);
+	    // console.log(i);
+	    if (i % 2 == 0) {
+	      // even - x then z
+	      for (var j = startX; j < endX; j++) {
+	        // Getting the 2D array
+	        var zArray = xzArray[j];
 	
-	//         for (var k = startZ; k < endZ + 1; k++) {
-	//           // console.log(zArray[k]);
-	//           if (zArray[k] === 2) {
-	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
-	//             var brick = new THREE.Mesh(geometry, material);
-	//             brick.position.set(j+20.0, (i+offset) * 3, k);
-	//             scene.add(brick);
-	//           } else if (zArray[k] === 4) {
-	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
-	//             var brick = new THREE.Mesh(geo2by4, material);
-	//             brick.position.set(j+20.0, (i+offset) * 3, k+0.5);
-	//             scene.add(brick);
-	//             k++;
-	//           } else if (zArray[k] === 6) {
-	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
-	//             var brick = new THREE.Mesh(geo2by6, material);
-	//             brick.position.set(j+20.0, (i+offset) * 3, k+1.0);
-	//             scene.add(brick);
-	//             k+=2;
-	//           } else if (zArray[k] === 8) {
-	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
-	//             var brick = new THREE.Mesh(geo2by8, material);
-	//             brick.position.set(j+20.0, (i+offset) * 3, k+1.5);
-	//             scene.add(brick);
-	//             k+=3;
-	//           }
-	//         }
-	//       }
-	//     } else { // odd - z then x
-	//       for (var k = startZ; k < endZ; k++) {
-	//         // Getting the 2D array
-	//         var xArray = zxArray[k];
-	//         // console.log(zxArray);
-	//         // console.log(k);
-	//         // console.log(xArray);
-	//         for (var j = startX; j < endX + 1; j++) {
-	//           if (xArray[j] === 2) {
-	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
-	//             var brick = new THREE.Mesh(geometry, material);
-	//             brick.position.set(j+20.0, (i+offset) * 3, k);
-	//             scene.add(brick);
-	//           } else if (xArray[j] === 4) {
-	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
-	//             var brick = new THREE.Mesh(geo4by2, material);
-	//             brick.position.set(j+0.5+20.0, (i+offset) * 3, k);
-	//             scene.add(brick);
-	//             j++;
-	//           } else if (xArray[j] === 6) {
-	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
-	//             var brick = new THREE.Mesh(geo6by2, material);
-	//             brick.position.set(j+1.0+20.0, (i+offset) * 3, k);
-	//             scene.add(brick);
-	//             j+=2;
-	//           } else if (xArray[j] === 8) {
-	//             var material = new THREE.MeshStandardMaterial({color:vocab.Color, metalness: 0.4, roughness: 0.5});
-	//             var brick = new THREE.Mesh(geo8by2, material);
-	//             brick.position.set(j+1.5+20.0, (i+offset) * 3, k);
-	//             scene.add(brick);
-	//             j+=3;
-	//           } else if (xArray[k] === 0) {
-	//             continue;
-	//           }
-	//         }
-	//       }
-	//     }
-	//   }
-	// }
+	        for (var k = startZ; k < endZ + 1; k++) {
+	          // console.log(zArray[k]);
+	          if (zArray[k] === 2) {
+	            var material = new THREE.MeshStandardMaterial({ color: vocab.Color, metalness: 0.4, roughness: 0.5 });
+	            var brick = new THREE.Mesh(geometry, material);
+	            brick.position.set(j + 30.0, (i + offset) * 4, k);
+	            scene.add(brick);
+	          } else if (zArray[k] === 4) {
+	            var material = new THREE.MeshStandardMaterial({ color: vocab.Color, metalness: 0.4, roughness: 0.5 });
+	            var brick = new THREE.Mesh(geo2by4, material);
+	            brick.position.set(j + 30.0, (i + offset) * 4, k + 0.5);
+	            scene.add(brick);
+	            k++;
+	          } else if (zArray[k] === 6) {
+	            var material = new THREE.MeshStandardMaterial({ color: vocab.Color, metalness: 0.4, roughness: 0.5 });
+	            var brick = new THREE.Mesh(geo2by6, material);
+	            brick.position.set(j + 30.0, (i + offset) * 4, k + 1.0);
+	            scene.add(brick);
+	            k += 2;
+	          } else if (zArray[k] === 8) {
+	            var material = new THREE.MeshStandardMaterial({ color: vocab.Color, metalness: 0.4, roughness: 0.5 });
+	            var brick = new THREE.Mesh(geo2by8, material);
+	            brick.position.set(j + 30.0, (i + offset) * 4, k + 1.5);
+	            scene.add(brick);
+	            k += 3;
+	          }
+	        }
+	      }
+	    } else {
+	      // odd - z then x
+	      for (var k = startZ; k < endZ; k++) {
+	        // Getting the 2D array
+	        var xArray = zxArray[k];
+	        // console.log(zxArray);
+	        // console.log(k);
+	        // console.log(xArray);
+	        for (var j = startX; j < endX + 1; j++) {
+	          if (xArray[j] === 2) {
+	            var material = new THREE.MeshStandardMaterial({ color: vocab.Color, metalness: 0.4, roughness: 0.5 });
+	            var brick = new THREE.Mesh(geometry, material);
+	            brick.position.set(j + 30.0, (i + offset) * 4, k);
+	            scene.add(brick);
+	          } else if (xArray[j] === 4) {
+	            var material = new THREE.MeshStandardMaterial({ color: vocab.Color, metalness: 0.4, roughness: 0.5 });
+	            var brick = new THREE.Mesh(geo4by2, material);
+	            brick.position.set(j + 0.5 + 30.0, (i + offset) * 4, k);
+	            scene.add(brick);
+	            j++;
+	          } else if (xArray[j] === 6) {
+	            var material = new THREE.MeshStandardMaterial({ color: vocab.Color, metalness: 0.4, roughness: 0.5 });
+	            var brick = new THREE.Mesh(geo6by2, material);
+	            brick.position.set(j + 1.0 + 30.0, (i + offset) * 4, k);
+	            scene.add(brick);
+	            j += 2;
+	          } else if (xArray[j] === 8) {
+	            var material = new THREE.MeshStandardMaterial({ color: vocab.Color, metalness: 0.4, roughness: 0.5 });
+	            var brick = new THREE.Mesh(geo8by2, material);
+	            brick.position.set(j + 1.5 + 30.0, (i + offset) * 4, k);
+	            scene.add(brick);
+	            j += 3;
+	          } else if (xArray[k] === 0) {
+	            continue;
+	          }
+	        }
+	      }
+	    }
+	  }
+	}
 
 /***/ }),
 /* 1 */
